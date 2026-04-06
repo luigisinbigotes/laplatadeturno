@@ -39,7 +39,7 @@
 
 .primaryButton {
   background: var(--primary);
-  color: #fff7ef;
+  color: var(--on-dark);
 }
 
 .primaryButton:hover,
@@ -86,7 +86,7 @@
   padding: 28px 32px;
   min-height: 240px;
   background:
-    linear-gradient(90deg, rgba(209, 75, 47, 0.1) 0%, rgba(209, 75, 47, 0.1) 68%, rgba(21, 21, 21, 0.05) 68%, rgba(21, 21, 21, 0.05) 100%),
+    linear-gradient(90deg, var(--hero-accent-left) 0%, var(--hero-accent-left) 68%, var(--hero-accent-right) 68%, var(--hero-accent-right) 100%),
     var(--surface-strong);
 }
 
@@ -113,7 +113,7 @@
   display: inline-flex;
   width: fit-content;
   background: var(--text);
-  color: #fbf7ef !important;
+  color: var(--surface) !important;
   padding: 8px 12px;
   font-size: 0.78rem;
   text-transform: uppercase;
@@ -144,8 +144,8 @@
   border-radius: 0;
   background: repeating-linear-gradient(
     135deg,
-    rgba(21, 21, 21, 0.04),
-    rgba(21, 21, 21, 0.04) 12px,
+    color-mix(in srgb, var(--line) 10%, transparent),
+    color-mix(in srgb, var(--line) 10%, transparent) 12px,
     transparent 12px,
     transparent 24px
   );
@@ -194,7 +194,7 @@
 
 .toggleActive {
   background: var(--text) !important;
-  color: #f8f2e8;
+  color: var(--surface);
 }
 
 .list {
@@ -210,7 +210,7 @@
   padding: 18px;
   border-radius: 0;
   border: 2px solid var(--line);
-  background: rgba(255, 255, 255, 0.34);
+  background: var(--panel-soft);
   cursor: pointer;
   transition: transform 120ms ease, background-color 120ms ease;
 }
@@ -220,7 +220,7 @@
 }
 
 .itemActive {
-  background: rgba(209, 75, 47, 0.16);
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 .itemIndex {
@@ -230,7 +230,7 @@
   place-items: center;
   border-radius: 0;
   background: var(--text);
-  color: #f8f2e8;
+  color: var(--surface);
   font-weight: 700;
 }
 
@@ -260,6 +260,15 @@
   letter-spacing: 0.08em;
   font-size: 0.8rem;
   font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+  .primaryButton:hover,
+  .toggle button:hover,
+  .item:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 color-mix(in srgb, var(--line) 28%, transparent);
+  }
 }
 
 .mapSkeleton,

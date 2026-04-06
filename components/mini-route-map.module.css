@@ -8,7 +8,7 @@
   border-right: 0;
   border-bottom: 0;
   border-left: 2px solid var(--line);
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--map-shell);
   display: flex;
   flex-direction: column;
   aspect-ratio: 1 / 1;
@@ -23,7 +23,7 @@
   padding: 10px 12px;
   font-size: 0.86rem;
   color: var(--muted);
-  background: rgba(247, 241, 232, 1);
+  background: var(--map-caption);
   border-top: 2px solid var(--line);
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -42,8 +42,8 @@
   border-bottom: 0;
   border-left: 2px solid var(--line);
   background:
-    linear-gradient(180deg, rgba(209, 75, 47, 0.08), rgba(255, 255, 255, 0.8)),
-    rgba(255, 255, 255, 0.72);
+    linear-gradient(180deg, var(--placeholder-top), var(--placeholder-bottom)),
+    var(--map-shell);
   aspect-ratio: 1 / 1;
 }
 
@@ -70,7 +70,7 @@
   width: 16px;
   height: 16px;
   border-radius: 999px;
-  border: 3px solid white;
+  border: 3px solid var(--surface);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 

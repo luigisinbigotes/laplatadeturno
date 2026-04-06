@@ -12,6 +12,15 @@
   --primary-strong: #a7361f;
   --danger: #a92222;
   --shadow: none;
+  --on-dark: #fbf7ef;
+  --panel-soft: rgba(255, 255, 255, 0.34);
+  --banner-soft: rgba(255, 255, 255, 0.44);
+  --map-shell: rgba(255, 255, 255, 0.5);
+  --map-caption: rgba(247, 241, 232, 1);
+  --placeholder-top: rgba(209, 75, 47, 0.08);
+  --placeholder-bottom: rgba(255, 255, 255, 0.8);
+  --hero-accent-left: rgba(209, 75, 47, 0.1);
+  --hero-accent-right: rgba(21, 21, 21, 0.05);
 }
 
 * {
@@ -27,6 +36,37 @@ body {
     linear-gradient(90deg, transparent 0, transparent 72%, rgba(221, 212, 194, 0.92) 72%, rgba(221, 212, 194, 0.92) 100%),
     linear-gradient(180deg, #f4eee1 0%, #ebe2d3 100%);
   color: var(--text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111111;
+    --bg-accent: #1b1b1b;
+    --surface: #171717;
+    --surface-strong: #1d1d1d;
+    --text: #f3eadc;
+    --muted: #d2c5b2;
+    --line: #f3eadc;
+    --primary: #4daf7c;
+    --primary-strong: #74c79b;
+    --danger: #ef7d7d;
+    --on-dark: #111111;
+    --panel-soft: rgba(255, 255, 255, 0.03);
+    --banner-soft: rgba(255, 255, 255, 0.05);
+    --map-shell: rgba(255, 255, 255, 0.04);
+    --map-caption: rgba(20, 20, 20, 0.96);
+    --placeholder-top: rgba(77, 175, 124, 0.12);
+    --placeholder-bottom: rgba(20, 20, 20, 0.92);
+    --hero-accent-left: rgba(77, 175, 124, 0.08);
+    --hero-accent-right: rgba(243, 234, 220, 0.04);
+  }
+
+  html,
+  body {
+    background:
+      linear-gradient(90deg, transparent 0, transparent 72%, rgba(27, 27, 27, 0.95) 72%, rgba(27, 27, 27, 0.95) 100%),
+      linear-gradient(180deg, #131313 0%, #0e0e0e 100%);
+  }
 }
 
 a {

@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   background:
-    linear-gradient(180deg, rgba(244, 238, 225, 0.98), rgba(235, 226, 211, 0.98));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 98%, transparent), color-mix(in srgb, var(--bg) 98%, transparent));
   animation: fadeOut 320ms ease 1.08s forwards;
 }
 
@@ -15,7 +15,7 @@
   aspect-ratio: 9 / 14;
   border: 2px solid var(--line);
   background:
-    linear-gradient(180deg, rgba(209, 75, 47, 0.08), rgba(255, 255, 255, 0.18)),
+    linear-gradient(180deg, color-mix(in srgb, var(--primary) 10%, transparent), color-mix(in srgb, var(--surface) 18%, transparent)),
     var(--surface);
   display: flex;
   flex-direction: column;

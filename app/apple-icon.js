@@ -22,11 +22,10 @@ export default function AppleIcon() {
       >
         <div
           style={{
-            width: 146,
-            height: 146,
+            width: 152,
+            height: 152,
             borderRadius: 0,
-            background: "#fffaf2",
-            border: "6px solid #151515",
+            background: "transparent",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -36,8 +35,8 @@ export default function AppleIcon() {
           <div
             style={{
               position: "absolute",
-              width: 24,
-              height: 84,
+              width: 34,
+              height: 108,
               background: "#2f8f63",
               borderRadius: 0
             }}
@@ -45,8 +44,8 @@ export default function AppleIcon() {
           <div
             style={{
               position: "absolute",
-              width: 84,
-              height: 24,
+              width: 108,
+              height: 34,
               background: "#2f8f63",
               borderRadius: 0
             }}

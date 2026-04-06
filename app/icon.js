@@ -22,23 +22,22 @@ export default function Icon() {
       >
         <div
           style={{
-            width: 408,
-            height: 408,
+            width: 420,
+            height: 420,
             borderRadius: 0,
-            background: "#fffaf2",
-            border: "14px solid #151515",
+            background: "transparent",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             position: "relative",
-            boxShadow: "0 18px 36px rgba(0,0,0,0.10)"
+            boxShadow: "none"
           }}
         >
           <div
             style={{
               position: "absolute",
-              width: 84,
-              height: 248,
+              width: 104,
+              height: 300,
               background: "#2f8f63",
               borderRadius: 0
             }}
@@ -46,8 +45,8 @@ export default function Icon() {
           <div
             style={{
               position: "absolute",
-              width: 248,
-              height: 84,
+              width: 300,
+              height: 104,
               background: "#2f8f63",
               borderRadius: 0
             }}
