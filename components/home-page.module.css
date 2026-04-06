@@ -1,0 +1,274 @@
+.page {
+  width: min(1160px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.hero {
+  margin-bottom: 24px;
+}
+
+.heroCard,
+.panel {
+  border: 2px solid var(--line);
+  border-radius: 0;
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.primaryButton,
+.toggle button {
+  border: 2px solid var(--line);
+  border-radius: 0;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.primaryButton {
+  background: var(--primary);
+  color: #fff7ef;
+}
+
+.primaryButton:hover,
+.toggle button:hover {
+  transform: translate(-2px, -2px);
+}
+
+.summary,
+.locationState,
+.error,
+.loading,
+.panelHeader p,
+.itemBody p,
+.heroCard p,
+.heroCard span {
+  color: var(--muted);
+}
+
+.summary,
+.locationState,
+.error {
+  margin: 16px 0 0;
+}
+
+.error {
+  color: var(--danger);
+}
+
+.heroCard {
+  padding: 28px 32px;
+  min-height: 240px;
+  background:
+    linear-gradient(90deg, rgba(209, 75, 47, 0.1) 0%, rgba(209, 75, 47, 0.1) 68%, rgba(21, 21, 21, 0.05) 68%, rgba(21, 21, 21, 0.05) 100%),
+    var(--surface-strong);
+}
+
+.heroContent {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(420px, 2fr);
+  gap: 0;
+  align-items: stretch;
+}
+
+.heroMain {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 32px;
+}
+
+.heroMap {
+  min-width: 0;
+  margin: -28px -32px -28px 24px;
+  display: flex;
+}
+
+.cardLabel {
+  display: inline-flex;
+  width: fit-content;
+  background: var(--text);
+  color: #fbf7ef !important;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.heroCard strong {
+  margin-top: 12px;
+  font-size: clamp(2.6rem, 5vw, 4.7rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  max-width: 8ch;
+  text-transform: uppercase;
+  font-family: "League Spartan", "Arial Narrow", sans-serif;
+}
+
+.heroCard > p,
+.heroMain > p {
+  max-width: 40ch;
+}
+
+.miniMapSkeleton {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--line);
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(21, 21, 21, 0.04),
+    rgba(21, 21, 21, 0.04) 12px,
+    transparent 12px,
+    transparent 24px
+  );
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+
+.panel {
+  padding: 24px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 2.3rem;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  font-family: "League Spartan", "Arial Narrow", sans-serif;
+}
+
+.panelHeader p {
+  margin: 8px 0 0;
+}
+
+.toggle {
+  display: inline-flex;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 0;
+  background: transparent;
+  border: 2px solid var(--line);
+}
+
+.toggle button {
+  background: transparent;
+}
+
+.toggleActive {
+  background: var(--text) !important;
+  color: #f8f2e8;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px;
+  border-radius: 0;
+  border: 2px solid var(--line);
+  background: rgba(255, 255, 255, 0.34);
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.item:hover {
+  transform: translate(-2px, -2px);
+}
+
+.itemActive {
+  background: rgba(209, 75, 47, 0.16);
+}
+
+.itemIndex {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 0;
+  background: var(--text);
+  color: #f8f2e8;
+  font-weight: 700;
+}
+
+.itemBody h3 {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  font-family: "League Spartan", "Arial Narrow", sans-serif;
+}
+
+.itemBody p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.itemMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.itemMeta a {
+  text-decoration: none;
+  color: var(--primary-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.mapSkeleton,
+.loading {
+  padding: 32px 0;
+}
+
+@media (max-width: 900px) {
+  .heroContent,
+  .panelHeader,
+  .item {
+    grid-template-columns: 1fr;
+  }
+
+  .heroMap {
+    margin: 24px 0 0;
+  }
+
+  .panelHeader {
+    align-items: flex-start;
+  }
+
+  .itemMeta {
+    align-items: flex-start;
+  }
+}

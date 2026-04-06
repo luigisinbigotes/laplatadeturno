@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=League+Spartan:wght@500;700;800&display=swap");
+
+:root {
+  --bg: #f1ecdf;
+  --bg-accent: #ddd4c2;
+  --surface: #fbf7ef;
+  --surface-strong: #f4eee2;
+  --text: #151515;
+  --muted: #2d2d2d;
+  --line: #151515;
+  --primary: #d14b2f;
+  --primary-strong: #a7361f;
+  --danger: #a92222;
+  --shadow: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "IBM Plex Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background:
+    linear-gradient(90deg, transparent 0, transparent 72%, rgba(221, 212, 194, 0.92) 72%, rgba(221, 212, 194, 0.92) 100%),
+    linear-gradient(180deg, #f4eee1 0%, #ebe2d3 100%);
+  color: var(--text);
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input {
+  font: inherit;
+}
