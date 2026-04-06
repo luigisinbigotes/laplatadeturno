@@ -17,6 +17,10 @@ const MiniRouteMap = dynamic(() => import("@/components/mini-route-map"), {
   loading: () => <div className={styles.miniMapSkeleton}>Cargando ruta...</div>
 });
 
+const ManualLocationPicker = dynamic(() => import("@/components/manual-location-picker"), {
+  ssr: false
+});
+
 const defaultCenter = {
   latitude: -34.9205,
   longitude: -57.9536
@@ -39,6 +43,7 @@ export default function HomePage() {
   const [location, setLocation] = useState(null);
   const [locationLabelResolved, setLocationLabelResolved] = useState("");
   const [requiresManualLocationRequest, setRequiresManualLocationRequest] = useState(false);
+  const [showManualLocationPicker, setShowManualLocationPicker] = useState(false);
   const [view, setView] = useState("list");
   const [pharmacies, setPharmacies] = useState([]);
   const [selectedPharmacyKey, setSelectedPharmacyKey] = useState(null);
@@ -48,6 +53,7 @@ export default function HomePage() {
   const nearest = pharmacies[0] ?? null;
   const activePharmacy =
     pharmacies.find((pharmacy) => pharmacyKey(pharmacy) === selectedPharmacyKey) ?? nearest ?? null;
+  const hasUsableLocation = permissionState === "granted" || permissionState === "manual";
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -75,7 +81,7 @@ export default function HomePage() {
   }, [pharmacies, selectedPharmacyKey]);
 
   useEffect(() => {
-    if (permissionState !== "granted" || !location || pharmacies.length === 0) {
+    if (!hasUsableLocation || !location || pharmacies.length === 0) {
       return;
     }
 
@@ -83,13 +89,13 @@ export default function HomePage() {
     nearestTen.forEach((pharmacy) => {
       void ensureRouteCached(location, pharmacy);
     });
-  }, [location, permissionState, pharmacies]);
+  }, [hasUsableLocation, location, pharmacies]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function resolveAddress() {
-      if (permissionState !== "granted" || !location) {
+      if (!hasUsableLocation || !location) {
         setLocationLabelResolved("");
         return;
       }
@@ -121,7 +127,14 @@ export default function HomePage() {
     return () => {
       cancelled = true;
     };
-  }, [location, permissionState]);
+  }, [hasUsableLocation, location, permissionState]);
+
+  function applyResolvedLocation(coords, nextPermissionState = "granted") {
+    setLocation(coords);
+    setPermissionState(nextPermissionState);
+    setShowManualLocationPicker(false);
+    loadTurnos(coords);
+  }
 
   async function loadTurnos(coords) {
     setLoading(true);
@@ -168,9 +181,7 @@ export default function HomePage() {
           longitude: position.coords.longitude
         };
 
-        setLocation(coords);
-        setPermissionState("granted");
-        loadTurnos(coords);
+        applyResolvedLocation(coords, "granted");
       },
       () => {
         setPermissionState("denied");
@@ -189,25 +200,42 @@ export default function HomePage() {
     );
   }
 
+  function openManualLocationPicker() {
+    setShowManualLocationPicker(true);
+  }
+
+  function confirmManualLocation(coords) {
+    setError("");
+    applyResolvedLocation(coords, "manual");
+  }
+
   const summaryText = useMemo(() => {
-    if (permissionState === "granted" && activePharmacy?.distanceKm != null) {
+    if (hasUsableLocation && activePharmacy?.distanceKm != null) {
       if (activePharmacy.distanceKm > 25) {
         return `Tu ubicacion parece estar fuera de La Plata. La farmacia seleccionada queda a ${activePharmacy.distanceKm.toFixed(2)} km.`;
+      }
+
+      if (permissionState === "manual") {
+        return `La farmacia seleccionada queda a ${formatDistance(activePharmacy.distanceKm)} del punto que elegiste en el mapa.`;
       }
 
       return `La farmacia seleccionada queda a ${formatDistance(activePharmacy.distanceKm)} de tu ubicacion.`;
     }
 
     return "Mostramos el turno vigente en La Plata; si habilitás tu ubicación, ordenamos por cercanía.";
-  }, [activePharmacy, permissionState]);
+  }, [activePharmacy, hasUsableLocation, permissionState]);
 
   const locationLabel = useMemo(() => {
-    if (permissionState === "granted" && location) {
+    if (hasUsableLocation && location) {
       if (locationLabelResolved) {
-        return `Ubicacion aproximada: ${locationLabelResolved}`;
+        return permissionState === "manual"
+          ? `Punto aproximado elegido: ${locationLabelResolved}`
+          : `Ubicacion aproximada: ${locationLabelResolved}`;
       }
 
-      return `Ubicacion aproximada: ${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`;
+      return permissionState === "manual"
+        ? `Punto elegido: ${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`
+        : `Ubicacion aproximada: ${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`;
     }
 
     if (permissionState === "pending") {
@@ -227,7 +255,7 @@ export default function HomePage() {
     }
 
     return "Usa el boton para compartir tu ubicacion y ordenar por cercania.";
-  }, [location, locationLabelResolved, permissionState, requiresManualLocationRequest]);
+  }, [hasUsableLocation, location, locationLabelResolved, permissionState, requiresManualLocationRequest]);
 
   return (
     <main className={styles.page} data-testid="home-page">
@@ -259,8 +287,17 @@ export default function HomePage() {
                   onClick={requestLocation}
                   data-testid="location-button"
                 >
-                  {permissionState === "granted" ? "Actualizar ubicacion" : "Usar mi ubicacion"}
+                  {hasUsableLocation ? "Actualizar ubicacion" : "Usar mi ubicacion"}
                 </button>
+                {(permissionState === "denied" || permissionState === "unsupported") && !hasUsableLocation ? (
+                  <button
+                    className={styles.secondaryButton}
+                    onClick={openManualLocationPicker}
+                    data-testid="manual-location-button"
+                  >
+                    Elegir en mapa
+                  </button>
+                ) : null}
               </div>
               <p className={styles.summary} data-testid="summary-text">
                 {summaryText}
@@ -288,7 +325,7 @@ export default function HomePage() {
               <MiniRouteMap
                 userLocation={location}
                 pharmacy={activePharmacy}
-                canRoute={permissionState === "granted"}
+                canRoute={hasUsableLocation}
               />
             </div>
           </div>
@@ -358,7 +395,7 @@ export default function HomePage() {
                   </p>
                 </div>
                 <div className={styles.itemMeta}>
-                  {permissionState === "granted" ? (
+                  {hasUsableLocation ? (
                     <span data-testid="pharmacy-card-distance">{formatDistance(pharmacy.distanceKm)}</span>
                   ) : null}
                   <a
@@ -375,6 +412,13 @@ export default function HomePage() {
           </div>
         )}
       </section>
+      {showManualLocationPicker ? (
+        <ManualLocationPicker
+          initialLocation={location ?? defaultCenter}
+          onCancel={() => setShowManualLocationPicker(false)}
+          onConfirm={confirmManualLocation}
+        />
+      ) : null}
     </main>
   );
 }

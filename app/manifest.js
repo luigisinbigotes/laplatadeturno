@@ -11,17 +11,17 @@ export default function manifest() {
     orientation: "portrait",
     icons: [
       {
-        src: "/icon?size=192&v=2",
+        src: "/icon?size=192&v=3",
         sizes: "192x192",
         type: "image/png"
       },
       {
-        src: "/icon?size=512&v=2",
+        src: "/icon?size=512&v=3",
         sizes: "512x512",
         type: "image/png"
       },
       {
-        src: "/apple-icon?v=2",
+        src: "/apple-icon?v=3",
         sizes: "180x180",
         type: "image/png"
       }

@@ -6,9 +6,9 @@ export const metadata = {
   description: "Farmacias de turno cercanas en La Plata",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icon?v=2",
-    apple: "/apple-icon?v=2",
-    shortcut: "/icon?v=2"
+    icon: "/icon?v=3",
+    apple: "/apple-icon?v=3",
+    shortcut: "/icon?v=3"
   },
   appleWebApp: {
     capable: true,

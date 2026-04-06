@@ -6,11 +6,25 @@
   padding: 14px 16px;
   margin-bottom: 18px;
   border: 2px solid var(--line);
-  background: var(--banner-soft);
+  background: linear-gradient(180deg, var(--banner-soft) 0%, color-mix(in srgb, var(--surface) 28%, transparent) 100%);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--glass-shadow) 42%, transparent);
+  position: relative;
+}
+
+.banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--glass-highlight) 0%, rgba(255, 255, 255, 0) 34%);
 }
 
 .copy {
   min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .kicker,
@@ -35,6 +49,8 @@
   display: flex;
   gap: 10px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .primary,
@@ -55,7 +71,7 @@
 }
 
 .secondary {
-  background: transparent;
+  background: color-mix(in srgb, var(--surface) 16%, transparent);
   color: var(--text);
 }
 

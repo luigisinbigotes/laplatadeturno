@@ -1,5 +1,5 @@
-const CACHE_NAME = "laplatadeturno-v1";
-const APP_SHELL = ["/", "/manifest.webmanifest", "/apple-icon", "/icon?size=192"];
+const CACHE_NAME = "laplatadeturno-v2";
+const APP_SHELL = ["/", "/manifest.webmanifest", "/apple-icon?v=3", "/icon?size=192&v=3"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
