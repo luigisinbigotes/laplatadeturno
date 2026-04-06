@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./home-page.module.css";
 import dynamic from "next/dynamic";
 import { ensureRouteCached } from "@/lib/route-cache-client";
@@ -39,6 +39,7 @@ function formatDistance(distanceKm) {
 }
 
 export default function HomePage() {
+  const heroSectionRef = useRef(null);
   const [permissionState, setPermissionState] = useState("prompt");
   const [location, setLocation] = useState(null);
   const [locationLabelResolved, setLocationLabelResolved] = useState("");
@@ -209,6 +210,20 @@ export default function HomePage() {
     applyResolvedLocation(coords, "manual");
   }
 
+  function selectPharmacy(pharmacy) {
+    const nextKey = pharmacyKey(pharmacy);
+
+    if (nextKey === selectedPharmacyKey) {
+      return;
+    }
+
+    setSelectedPharmacyKey(nextKey);
+    heroSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+
   const summaryText = useMemo(() => {
     if (hasUsableLocation && activePharmacy?.distanceKm != null) {
       if (activePharmacy.distanceKm > 25) {
@@ -261,7 +276,7 @@ export default function HomePage() {
     <main className={styles.page} data-testid="home-page">
       <SplashScreen />
       <InstallPrompt />
-      <section className={styles.hero} data-testid="hero-section">
+      <section className={styles.hero} data-testid="hero-section" ref={heroSectionRef}>
         <div className={styles.heroCard} data-testid="hero-card">
           <div className={styles.heroContent}>
             <div className={styles.heroMain} data-testid="hero-main">
@@ -372,7 +387,7 @@ export default function HomePage() {
                   pharmacyKey(pharmacy) === selectedPharmacyKey ? styles.itemActive : ""
                 }`}
                 key={`${pharmacy.name}-${pharmacy.address}`}
-                onClick={() => setSelectedPharmacyKey(pharmacyKey(pharmacy))}
+                onClick={() => selectPharmacy(pharmacy)}
                 role="button"
                 tabIndex={0}
                 data-testid={`pharmacy-card-${index}`}
@@ -380,7 +395,7 @@ export default function HomePage() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
-                    setSelectedPharmacyKey(pharmacyKey(pharmacy));
+                    selectPharmacy(pharmacy);
                   }
                 }}
               >
