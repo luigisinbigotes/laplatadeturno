@@ -5,6 +5,7 @@ import styles from "./home-page.module.css";
 import dynamic from "next/dynamic";
 import { ensureRouteCached } from "@/lib/route-cache-client";
 import SplashScreen from "@/components/splash-screen";
+import InstallPrompt from "@/components/install-prompt";
 
 const TurnoMap = dynamic(() => import("@/components/turno-map"), {
   ssr: false,
@@ -210,6 +211,7 @@ export default function HomePage() {
   return (
     <main className={styles.page}>
       <SplashScreen />
+      <InstallPrompt />
       <section className={styles.hero}>
         <div className={styles.heroCard}>
           <div className={styles.heroContent}>
