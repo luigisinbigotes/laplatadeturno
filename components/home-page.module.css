@@ -64,6 +64,20 @@
   margin: 16px 0 0;
 }
 
+.resetSelectionButton {
+  width: fit-content;
+  margin-top: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
 .error {
   color: var(--danger);
 }

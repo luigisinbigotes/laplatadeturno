@@ -140,7 +140,9 @@ export default function HomePage() {
       }
 
       const data = await response.json();
-      setPharmacies(data.pharmacies ?? []);
+      const nextPharmacies = data.pharmacies ?? [];
+      setPharmacies(nextPharmacies);
+      setSelectedPharmacyKey(nextPharmacies[0] ? pharmacyKey(nextPharmacies[0]) : null);
     } catch (fetchError) {
       setError(fetchError.message);
     } finally {
@@ -253,6 +255,14 @@ export default function HomePage() {
                 </button>
               </div>
               <p className={styles.summary}>{summaryText}</p>
+              {activePharmacy && nearest && pharmacyKey(activePharmacy) !== pharmacyKey(nearest) ? (
+                <button
+                  className={styles.resetSelectionButton}
+                  onClick={() => setSelectedPharmacyKey(pharmacyKey(nearest))}
+                >
+                  Volver a la mas cercana
+                </button>
+              ) : null}
               <p className={styles.locationState}>{locationLabel}</p>
               {error ? <p className={styles.error}>{error}</p> : null}
             </div>
