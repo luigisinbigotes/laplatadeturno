@@ -13,6 +13,24 @@ export async function requestLocation(page) {
   });
 }
 
+export async function waitForLocatedResults(page) {
+  const cards = pharmacyCards(page);
+  await expect(cards.first()).toBeVisible();
+  await expect(cards.first().getByTestId("pharmacy-card-distance")).toBeVisible({ timeout: 15000 });
+  await expect(cards.nth(1).getByTestId("pharmacy-card-distance")).toBeVisible({ timeout: 15000 });
+
+  await expect.poll(
+    async () => {
+      const firstCardTitle = ((await cards.first().getByTestId("pharmacy-card-name").textContent()) ?? "").trim();
+      const bannerTitle = ((await page.getByTestId("active-pharmacy-name").textContent()) ?? "").trim();
+      return Boolean(bannerTitle) && bannerTitle === firstCardTitle;
+    },
+    {
+      timeout: 15000
+    }
+  ).toBe(true);
+}
+
 export function pharmacyCards(page) {
   return page.locator("article[role='button'][data-testid^='pharmacy-card-']");
 }

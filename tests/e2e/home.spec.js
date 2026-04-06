@@ -5,6 +5,7 @@ import {
   parseDistanceMeters,
   pharmacyCards,
   requestLocation,
+  waitForLocatedResults,
   waitForHydration
 } from "./helpers";
 
@@ -26,6 +27,7 @@ test.describe("La Plata DeTurno", () => {
     await page.goto("/");
     await waitForHydration(page);
     await requestLocation(page);
+    await waitForLocatedResults(page);
 
     const cards = pharmacyCards(page);
     await expect(cards.first()).toBeVisible();
@@ -54,21 +56,29 @@ test.describe("La Plata DeTurno", () => {
     await page.goto("/");
     await waitForHydration(page);
     await requestLocation(page);
+    await waitForLocatedResults(page);
 
     const cards = pharmacyCards(page);
     await expect(cards.first()).toBeVisible();
-    const selected = await extractCard(cards.nth(1));
+    const selectedCard = cards.nth(1);
+    const selected = await extractCard(selectedCard);
 
-    await cards.nth(1).click();
+    await selectedCard.click();
 
-    let banner = await extractBanner(page);
-    expect(banner.label.toLowerCase()).toContain("farmacia seleccionada");
-    expect(banner.title).toBe(selected.title);
+    await expect.poll(
+      async () => {
+        const banner = await extractBanner(page);
+        return `${banner.label.toLowerCase()}|||${banner.title}`;
+      },
+      {
+        timeout: 10000
+      }
+    ).toBe(`farmacia seleccionada|||${selected.title}`);
 
     await page.getByTestId("reset-selection-button").click();
-    await expect(cards.first()).toBeVisible();
+    await waitForLocatedResults(page);
     const nearestAfterReset = await extractCard(cards.first());
-    banner = await extractBanner(page);
+    const banner = await extractBanner(page);
     expect(banner.label.toLowerCase()).toContain("mas cercana ahora");
     expect(banner.title).toBe(nearestAfterReset.title);
   });
