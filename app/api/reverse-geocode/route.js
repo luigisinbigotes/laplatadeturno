@@ -1,4 +1,12 @@
+import {
+  applyRateLimit,
+  getCachedValue,
+  isWithinLaPlataBounds,
+  setCachedValue
+} from "@/lib/security";
+
 const addressCache = new Map();
+const ADDRESS_CACHE_TTL_MS = 30 * 60 * 1000;
 
 function buildApproximateAddress(address) {
   if (!address) {
@@ -18,6 +26,11 @@ function buildApproximateAddress(address) {
 }
 
 export async function GET(request) {
+  const rateLimited = applyRateLimit(request, "reverse-geocode", 30, 60 * 1000);
+  if (rateLimited) {
+    return rateLimited;
+  }
+
   const { searchParams } = new URL(request.url);
   const latitude = Number(searchParams.get("lat"));
   const longitude = Number(searchParams.get("lng"));
@@ -29,12 +42,19 @@ export async function GET(request) {
     );
   }
 
+  if (!isWithinLaPlataBounds(latitude, longitude)) {
+    return Response.json(
+      { error: "coordinates_out_of_scope" },
+      { status: 400, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const cacheKey = `${latitude.toFixed(5)}:${longitude.toFixed(5)}`;
-  const cached = addressCache.get(cacheKey);
+  const cached = getCachedValue(addressCache, cacheKey, ADDRESS_CACHE_TTL_MS);
   if (cached) {
     return Response.json(cached, {
       headers: {
-        "Cache-Control": "no-store"
+        "Cache-Control": "private, no-store"
       }
     });
   }
@@ -72,11 +92,11 @@ export async function GET(request) {
         null
     };
 
-    addressCache.set(cacheKey, result);
+    setCachedValue(addressCache, cacheKey, result, ADDRESS_CACHE_TTL_MS);
 
     return Response.json(result, {
       headers: {
-        "Cache-Control": "no-store"
+        "Cache-Control": "private, no-store"
       }
     });
   } catch {
@@ -84,7 +104,7 @@ export async function GET(request) {
       { label: null },
       {
         headers: {
-          "Cache-Control": "no-store"
+          "Cache-Control": "private, no-store"
         }
       }
     );

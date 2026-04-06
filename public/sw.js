@@ -30,6 +30,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  if (url.pathname.startsWith("/api/")) {
+    return;
+  }
+
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request).catch(() => caches.match("/"))
@@ -45,6 +49,11 @@ self.addEventListener("fetch", (event) => {
 
       return fetch(request).then((response) => {
         if (!response.ok) {
+          return response;
+        }
+
+        const cacheControl = response.headers.get("Cache-Control") || "";
+        if (cacheControl.includes("no-store")) {
           return response;
         }
 

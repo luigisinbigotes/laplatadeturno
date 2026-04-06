@@ -1,0 +1,79 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, rgba(244, 238, 225, 0.98), rgba(235, 226, 211, 0.98));
+  animation: fadeOut 320ms ease 1.08s forwards;
+}
+
+.card {
+  width: min(86vw, 360px);
+  aspect-ratio: 9 / 14;
+  border: 2px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(209, 75, 47, 0.08), rgba(255, 255, 255, 0.18)),
+    var(--surface);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px;
+}
+
+.mark {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 28px;
+  border: 2px solid var(--line);
+}
+
+.crossVertical,
+.crossHorizontal {
+  position: absolute;
+  background: var(--primary);
+}
+
+.crossVertical {
+  top: 10px;
+  bottom: 10px;
+  left: 28px;
+  width: 8px;
+}
+
+.crossHorizontal {
+  left: 10px;
+  right: 10px;
+  top: 28px;
+  height: 8px;
+}
+
+.kicker,
+.subtle {
+  margin: 0;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.74rem;
+}
+
+.title {
+  margin: 10px 0 10px;
+  color: var(--text);
+  font-family: "League Spartan", "Arial Narrow", sans-serif;
+  font-size: clamp(2.6rem, 12vw, 4.6rem);
+  line-height: 0.88;
+  letter-spacing: -0.08em;
+  text-transform: uppercase;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./home-page.module.css";
 import dynamic from "next/dynamic";
 import { ensureRouteCached } from "@/lib/route-cache-client";
+import SplashScreen from "@/components/splash-screen";
 
 const TurnoMap = dynamic(() => import("@/components/turno-map"), {
   ssr: false,
@@ -208,6 +209,7 @@ export default function HomePage() {
 
   return (
     <main className={styles.page}>
+      <SplashScreen />
       <section className={styles.hero}>
         <div className={styles.heroCard}>
           <div className={styles.heroContent}>

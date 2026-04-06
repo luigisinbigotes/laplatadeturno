@@ -1,4 +1,19 @@
+import {
+  applyRateLimit,
+  getCachedValue,
+  isWithinLaPlataBounds,
+  setCachedValue
+} from "@/lib/security";
+
+const routeCache = new Map();
+const ROUTE_CACHE_TTL_MS = 30 * 60 * 1000;
+
 export async function GET(request) {
+  const rateLimited = applyRateLimit(request, "route", 60, 60 * 1000);
+  if (rateLimited) {
+    return rateLimited;
+  }
+
   const { searchParams } = new URL(request.url);
   const fromLat = Number(searchParams.get("fromLat"));
   const fromLng = Number(searchParams.get("fromLng"));
@@ -12,10 +27,26 @@ export async function GET(request) {
     );
   }
 
+  if (!isWithinLaPlataBounds(fromLat, fromLng) || !isWithinLaPlataBounds(toLat, toLng)) {
+    return Response.json(
+      { error: "coordinates_out_of_scope" },
+      { status: 400, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const fallback = [
     [fromLat, fromLng],
     [toLat, toLng]
   ];
+  const cacheKey = `${fromLat.toFixed(5)}:${fromLng.toFixed(5)}:${toLat.toFixed(5)}:${toLng.toFixed(5)}`;
+  const cached = getCachedValue(routeCache, cacheKey, ROUTE_CACHE_TTL_MS);
+  if (cached) {
+    return Response.json(cached, {
+      headers: {
+        "Cache-Control": "private, no-store"
+      }
+    });
+  }
 
   try {
     const controller = new AbortController();
@@ -47,32 +78,34 @@ export async function GET(request) {
       throw new Error("empty_route");
     }
 
-    return Response.json(
-      {
-        mode: "walking",
-        source: "routing.openstreetmap.de",
-        fallback: false,
-        points
-      },
-      {
-        headers: {
-          "Cache-Control": "no-store"
-        }
+    const result = {
+      mode: "walking",
+      source: "routing.openstreetmap.de",
+      fallback: false,
+      points
+    };
+
+    setCachedValue(routeCache, cacheKey, result, ROUTE_CACHE_TTL_MS);
+
+    return Response.json(result, {
+      headers: {
+        "Cache-Control": "private, no-store"
       }
-    );
+    });
   } catch {
-    return Response.json(
-      {
-        mode: "walking",
-        source: "fallback",
-        fallback: true,
-        points: fallback
-      },
-      {
-        headers: {
-          "Cache-Control": "no-store"
-        }
+    const result = {
+      mode: "walking",
+      source: "fallback",
+      fallback: true,
+      points: fallback
+    };
+
+    setCachedValue(routeCache, cacheKey, result, 5 * 60 * 1000);
+
+    return Response.json(result, {
+      headers: {
+        "Cache-Control": "private, no-store"
       }
-    );
+    });
   }
 }
