@@ -135,6 +135,14 @@
   display: flex;
 }
 
+.heroMiniMapFrame {
+  width: 100%;
+}
+
+.heroMiniMapDocked {
+  animation: dockBounce 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .cardLabel {
   display: inline-flex;
   width: fit-content;
@@ -310,6 +318,47 @@
   z-index: 1;
 }
 
+.floatingMiniMap {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  width: min(340px, calc(100vw - 36px));
+  z-index: 60;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.5));
+  animation: floatMiniMapIn 420ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+@keyframes floatMiniMapIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0) scale(0.94);
+  }
+
+  62% {
+    opacity: 1;
+    transform: translate3d(0, -6px, 0) scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes dockBounce {
+  0% {
+    transform: translate3d(0, -14px, 0) scale(0.97);
+  }
+
+  58% {
+    transform: translate3d(0, 4px, 0) scale(1.01);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   .primaryButton:hover,
   .secondaryButton:hover,
@@ -342,5 +391,170 @@
 
   .itemMeta {
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    width: 100%;
+    margin: 0;
+    padding: 0 0 32px;
+  }
+
+  .hero {
+    margin-bottom: 12px;
+  }
+
+  .heroCard {
+    padding: 18px 14px;
+    overflow: hidden;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .heroMain {
+    padding: 14px 12px 0;
+  }
+
+  .heroCard strong {
+    max-width: none;
+    font-size: clamp(2.3rem, 13vw, 4rem);
+    line-height: 0.88;
+  }
+
+  .heroMap {
+    margin: 16px -14px -18px;
+  }
+
+  .panel {
+    padding: 18px 14px;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .item,
+  .toggle,
+  .miniMapSkeleton,
+  .primaryButton,
+  .secondaryButton {
+    border: 0;
+    box-shadow: none;
+  }
+
+  .panelHeader h2 {
+    font-size: 1.65rem;
+    line-height: 0.94;
+    max-width: 4ch;
+  }
+
+  .panelHeader {
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .panelHeader p {
+    margin-top: 6px;
+    max-width: 18ch;
+    font-size: 0.92rem;
+    line-height: 1.2;
+  }
+
+  .toggle {
+    width: 100%;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .toggle button {
+    flex: 1;
+    border: 0;
+    padding: 11px 10px;
+    font-size: 0.74rem;
+  }
+
+  .list {
+    gap: 10px;
+  }
+
+  .item {
+    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-areas:
+      "index title"
+      "index address"
+      "index meta"
+      "distance distance"
+      "action action";
+    gap: 0 12px;
+    padding: 14px 12px 12px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 58%, transparent) 0%, color-mix(in srgb, var(--panel-soft) 90%, transparent) 100%);
+  }
+
+  .itemIndex {
+    grid-area: index;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 1rem;
+  }
+
+  .itemBody {
+    display: contents;
+  }
+
+  .itemBody h3 {
+    grid-area: title;
+    margin: 2px 0 4px;
+    font-size: 1rem;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .itemBody p[data-testid="pharmacy-card-address"] {
+    grid-area: address;
+    font-size: 0.98rem;
+    line-height: 1.2;
+  }
+
+  .itemBody p[data-testid="pharmacy-card-meta"] {
+    grid-area: meta;
+    margin-top: 4px;
+    font-size: 0.88rem;
+    line-height: 1.2;
+    color: color-mix(in srgb, var(--muted) 82%, transparent);
+  }
+
+  .itemMeta {
+    display: contents;
+  }
+
+  .itemMeta span[data-testid="pharmacy-card-distance"] {
+    grid-area: distance;
+    margin-top: 10px;
+    display: inline-flex;
+    width: fit-content;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+    color: var(--text);
+    font-weight: 700;
+    font-size: 0.86rem;
+  }
+
+  .itemMeta a {
+    grid-area: action;
+    margin-top: 10px;
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    padding: 0;
+    font-size: 0.88rem;
+    letter-spacing: 0.06em;
+  }
+
+  .floatingMiniMap {
+    right: 12px;
+    bottom: 14px;
+    width: min(280px, calc(100vw - 24px));
   }
 }

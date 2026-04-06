@@ -5,10 +5,43 @@ export async function waitForHydration(page) {
   await page.getByTestId("home-page").waitFor({ state: "visible" });
 }
 
+export async function denyGeolocation(page) {
+  await page.addInitScript(() => {
+    const geolocation = {
+      getCurrentPosition(success, error) {
+        if (typeof error === "function") {
+          error({
+            code: 1,
+            message: "Permission denied"
+          });
+        }
+      },
+      watchPosition() {
+        return 0;
+      },
+      clearWatch() {}
+    };
+
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: geolocation
+    });
+  });
+}
+
 export async function requestLocation(page) {
   const locationButton = page.getByTestId("location-button");
   await locationButton.click();
   await expect(page.getByTestId("location-state")).toContainText(/ubicacion aproximada:/i, {
+    timeout: 15000
+  });
+}
+
+export async function confirmManualLocation(page) {
+  await page.getByTestId("manual-location-button").click();
+  await expect(page.getByTestId("manual-location-modal")).toBeVisible();
+  await page.getByTestId("manual-location-confirm").click();
+  await expect(page.getByTestId("location-state")).toContainText(/punto/i, {
     timeout: 15000
   });
 }
@@ -71,4 +104,22 @@ export function parseDistanceMeters(distanceText) {
   }
 
   return Number.NaN;
+}
+
+export async function scrollToBottom(page) {
+  await page.evaluate(() => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "auto"
+    });
+  });
+}
+
+export async function scrollToTop(page) {
+  await page.evaluate(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "auto"
+    });
+  });
 }

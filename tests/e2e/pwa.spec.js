@@ -13,7 +13,7 @@ test.describe("PWA surface", () => {
   });
 
   test("serves the generated icon", async ({ request }) => {
-    const response = await request.get("/icon?size=192&v=2");
+    const response = await request.get("/icon?size=192&v=3");
     expect(response.ok()).toBeTruthy();
     expect(response.headers()["content-type"]).toContain("image/png");
   });

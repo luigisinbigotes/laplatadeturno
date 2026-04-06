@@ -40,6 +40,7 @@ function formatDistance(distanceKm) {
 
 export default function HomePage() {
   const heroSectionRef = useRef(null);
+  const wasFloatingRef = useRef(false);
   const [permissionState, setPermissionState] = useState("prompt");
   const [location, setLocation] = useState(null);
   const [locationLabelResolved, setLocationLabelResolved] = useState("");
@@ -50,6 +51,8 @@ export default function HomePage() {
   const [selectedPharmacyKey, setSelectedPharmacyKey] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showFloatingMiniMap, setShowFloatingMiniMap] = useState(false);
+  const [heroMiniMapDocked, setHeroMiniMapDocked] = useState(false);
 
   const nearest = pharmacies[0] ?? null;
   const activePharmacy =
@@ -69,6 +72,50 @@ export default function HomePage() {
 
     requestLocation();
   }, []);
+
+  useEffect(() => {
+    const heroSection = heroSectionRef.current;
+    if (!heroSection) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const nextFloating =
+          view === "list" &&
+          !showManualLocationPicker &&
+          entry.intersectionRatio < 0.35 &&
+          !entry.isIntersecting;
+
+        setShowFloatingMiniMap(nextFloating);
+      },
+      {
+        threshold: [0, 0.2, 0.35, 0.5]
+      }
+    );
+
+    observer.observe(heroSection);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [showManualLocationPicker, view]);
+
+  useEffect(() => {
+    if (wasFloatingRef.current && !showFloatingMiniMap) {
+      setHeroMiniMapDocked(true);
+      const timeoutId = window.setTimeout(() => {
+        setHeroMiniMapDocked(false);
+      }, 520);
+
+      wasFloatingRef.current = false;
+      return () => window.clearTimeout(timeoutId);
+    }
+
+    if (showFloatingMiniMap) {
+      wasFloatingRef.current = true;
+    }
+  }, [showFloatingMiniMap]);
 
   useEffect(() => {
     if (!pharmacies.length) {
@@ -337,11 +384,13 @@ export default function HomePage() {
             </div>
 
             <div className={styles.heroMap} data-testid="hero-mini-map">
-              <MiniRouteMap
-                userLocation={location}
-                pharmacy={activePharmacy}
-                canRoute={hasUsableLocation}
-              />
+              <div className={`${styles.heroMiniMapFrame} ${heroMiniMapDocked ? styles.heroMiniMapDocked : ""}`}>
+                <MiniRouteMap
+                  userLocation={location}
+                  pharmacy={activePharmacy}
+                  canRoute={hasUsableLocation}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -433,6 +482,16 @@ export default function HomePage() {
           onCancel={() => setShowManualLocationPicker(false)}
           onConfirm={confirmManualLocation}
         />
+      ) : null}
+      {showFloatingMiniMap && view === "list" ? (
+        <div className={styles.floatingMiniMap} data-testid="floating-mini-map">
+          <MiniRouteMap
+            userLocation={location}
+            pharmacy={activePharmacy}
+            canRoute={hasUsableLocation}
+            variant="floating"
+          />
+        </div>
       ) : null}
     </main>
   );

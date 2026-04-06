@@ -32,3 +32,10 @@
 .userMarker span {
   background: #2563eb;
 }
+
+@media (max-width: 700px) {
+  .wrapper {
+    border: 0;
+    border-radius: 0;
+  }
+}

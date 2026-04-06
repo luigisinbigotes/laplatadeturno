@@ -2,66 +2,80 @@
 
 ## Role
 Primary agent owns:
-- test planning
-- test generation
-- test maintenance
+- coverage planning
+- test implementation
 - flake reduction
-- regression scope decisions
+- selector stability
+- deciding what should be deterministic vs exploratory
 
-Sub-agents, if used later, should split across:
-- planner: suite architecture and priority
-- generator: case implementation
-- reviewer: flake and selector hardening
+Optional delegated roles:
+- planner: suite map and priority changes
+- generator: draft new cases and helpers
+- reviewer: detect brittle assertions and stale coverage
 
-## Objectives
-- protect core user flows on mobile first
-- prioritize deterministic geolocation behavior
-- keep PWA/install surface covered
-- separate stable regression checks from exploratory UX checks
+## Product Scope
+Current product behavior that tests must reflect:
+- mobile-first home flow
+- geolocation-driven nearest pharmacy ordering
+- manual map-based location fallback when browser location is denied
+- selectable pharmacy list with hero sync
+- scroll-to-hero behavior when selecting another pharmacy
+- floating mini map in list view after scrolling away from the hero
+- map/list toggle
+- dark mode
+- PWA metadata and icon surface
+- API hardening for in-scope vs out-of-scope coordinates
 
 ## Test Layers
 1. API contract and hardening
-- validate success shape for in-scope requests
-- validate rejection for out-of-scope coordinates
-- validate manifest and icon endpoints
+- in-scope `/api/farmacias` returns sorted pharmacies
+- out-of-scope `/api/route` rejects
+- out-of-scope `/api/reverse-geocode` rejects
+- manifest and icon endpoints stay valid
 
 2. Deterministic UI
 - home smoke
-- geolocation flow with mocked La Plata coordinates
+- successful geolocation flow with mocked La Plata coordinates
+- manual location fallback after geolocation denial
 - list/map toggle
-- selected pharmacy behavior
-- reset-to-nearest behavior
-- dark mode render integrity
+- selecting another pharmacy updates hero
+- reset-to-nearest restores hero/list alignment
+- scroll-to-hero after selecting a different pharmacy
+- floating mini map appears/disappears with list scroll
+- key content remains visible across themes
 
-3. PWA surface
+3. PWA and workflow surface
 - manifest contract
-- icon availability
-- install prompt visibility where deterministic
+- icon endpoint version
+- install workflow artifacts and GitHub summary behavior
 
 4. Exploratory
-- real-device Safari permission behavior
-- install flow on iPhone home screen
-- visual polish and spacing
-- stale cache behavior
+- real-device Safari permission quirks
+- iPhone home-screen install behavior and icon cache
+- floating mini map motion feel
+- visual polish and spacing on small screens
+- service-worker cache behavior after updates
 
 ## Priority
 ### P0
-- top banner must match the first list item after a successful location refresh
-- list ordering must be monotonic by distance for the first visible items
-- selecting another pharmacy must update the banner
-- resetting must restore the nearest one
+- after successful location, hero pharmacy must match the first list item
+- first visible distances must be monotonic for the nearest items
+- selecting another pharmacy must update the hero and scroll back to it
+- reset-to-nearest must restore hero/list alignment
+- denied geolocation must still allow manual location and nearest ordering
+- floating mini map must appear in list view after scrolling away from hero and disappear after returning
 - out-of-scope API calls must reject
-- dark mode must preserve key content and controls
 
 ### P1
 - map view renders
-- install prompt/guidance appears when expected
+- dark mode preserves key controls and content
 - manifest and icon endpoints stay valid
+- install/video workflow remains usable for stakeholders
 
 ### P2
 - splash timing
 - copy refinements
-- visual regression
+- visual regression snapshots after behavior stabilizes
 
 ## Canonical Data
 Use this stable La Plata mock location:
@@ -72,21 +86,24 @@ Use this out-of-scope location:
 
 ## Selector Policy
 Prefer:
-- role + accessible name
-- stable headings and buttons
-- card extraction helpers anchored to `article[role='button']`
+- `data-testid` for stateful UI regions
+- role + accessible name for controls
+- helpers anchored to `article[role='button'][data-testid^='pharmacy-card-']`
 
 Avoid:
-- CSS module hash selectors
-- nth-child without semantic purpose
-- relying on transient loading copy
+- CSS module hashes
+- raw nth-child selectors without semantic anchoring
+- transient loading or provider-specific copy as hard assertions
 
 ## Flake Policy
-- always wait for hydration
-- wait for location label before asserting ordered geo UI
-- do not assert exact external provider strings
-- do not assert exact route geometry
-- do not couple deterministic tests to splash disappearance timing
+- always wait for hydration first
+- after location success, wait for:
+  - distance labels to appear
+  - hero pharmacy to equal first list item
+- do not assert exact route geometry or reverse-geocode strings
+- do not depend on splash disappearance timing
+- for scroll-based UI, use polling on stable DOM state instead of fixed sleeps
+- treat flaky in CI as failure
 
 ## Execution Policy
 Fast local validation:
@@ -102,8 +119,12 @@ Interactive:
 
 CI:
 - run against deployed prod URL via `PLAYWRIGHT_BASE_URL`
+- publish GitHub summary directly on the workflow page
+- optionally publish full videos via `record_videos`
 
 ## Near-Term Expansion
 - map marker interaction should update selected pharmacy if that feature is added
-- add offline/service-worker sanity checks
-- add visual regression snapshots only after behavioral tests stabilize
+- add assertions for floating mini map not appearing in `Mapa` mode
+- add modal interaction coverage for dragging the manual-location marker
+- add service-worker update sanity after icon/manifest version bumps
+- add visual snapshots only after scroll and floating-map behavior prove stable

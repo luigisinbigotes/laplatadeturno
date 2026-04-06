@@ -1,10 +1,14 @@
 import { expect, test } from "@playwright/test";
 import {
+  confirmManualLocation,
+  denyGeolocation,
   extractBanner,
   extractCard,
   parseDistanceMeters,
   pharmacyCards,
   requestLocation,
+  scrollToBottom,
+  scrollToTop,
   waitForLocatedResults,
   waitForHydration
 } from "./helpers";
@@ -83,13 +87,67 @@ test.describe("La Plata DeTurno", () => {
     expect(banner.title).toBe(nearestAfterReset.title);
   });
 
-  test("renders dark mode without losing key content", async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== "iphone-dark", "Dark-mode check only runs in dark project");
+  test("can choose a manual location when geolocation is denied", async ({ page }) => {
+    await denyGeolocation(page);
+    await page.goto("/");
+    await waitForHydration(page);
+    await expect(page.getByTestId("manual-location-button")).toBeVisible();
+    await confirmManualLocation(page);
+    await waitForLocatedResults(page);
 
+    const cards = pharmacyCards(page);
+    const banner = await extractBanner(page);
+    const firstCard = await extractCard(cards.first());
+
+    await expect(page.getByTestId("location-state")).toContainText(/punto/i);
+    expect(banner.title).toBe(firstCard.title);
+  });
+
+  test("shows a floating mini map in list view after scrolling away from the hero", async ({ page }) => {
+    await page.goto("/");
+    await waitForHydration(page);
+    await requestLocation(page);
+    await waitForLocatedResults(page);
+
+    await scrollToBottom(page);
+    await expect(page.getByTestId("floating-mini-map")).toBeVisible();
+
+    await scrollToTop(page);
+    await expect
+      .poll(async () => await page.getByTestId("floating-mini-map").count(), {
+        timeout: 10000
+      })
+      .toBe(0);
+  });
+
+  test("scrolls back to the hero when selecting a different pharmacy from the list", async ({ page }) => {
+    await page.goto("/");
+    await waitForHydration(page);
+    await requestLocation(page);
+    await waitForLocatedResults(page);
+
+    const cards = pharmacyCards(page);
+    await expect(cards.nth(1)).toBeVisible();
+    await scrollToBottom(page);
+    await cards.nth(1).click();
+
+    await expect
+      .poll(async () => {
+        const box = await page.getByTestId("hero-section").boundingBox();
+        return box?.y ?? Number.POSITIVE_INFINITY;
+      })
+      .toBeLessThan(40);
+  });
+
+  test("renders key content in every theme", async ({ page }, testInfo) => {
     await page.goto("/");
     await waitForHydration(page);
 
     await expect(page.getByRole("heading", { name: "Turno del dia" })).toBeVisible();
     await expect(page.getByTestId("location-button")).toBeVisible();
+
+    if (testInfo.project.name === "iphone-dark") {
+      await expect(page.getByTestId("hero-card")).toBeVisible();
+    }
   });
 });

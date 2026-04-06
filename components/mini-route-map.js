@@ -39,7 +39,7 @@ function FitBounds({ points }) {
   return null;
 }
 
-export default function MiniRouteMap({ userLocation, pharmacy, canRoute }) {
+export default function MiniRouteMap({ userLocation, pharmacy, canRoute, variant = "hero" }) {
   const [routePoints, setRoutePoints] = useState([]);
   const [routeStatus, setRouteStatus] = useState("idle");
   const destination = useMemo(() => {
@@ -115,19 +115,25 @@ export default function MiniRouteMap({ userLocation, pharmacy, canRoute }) {
 
   if (!userLocation || !destination || !canRoute) {
     return (
-      <div className={styles.placeholder} data-testid="mini-route-map-placeholder">
+      <div
+        className={`${styles.placeholder} ${variant === "floating" ? styles.placeholderFloating : ""}`}
+        data-testid="mini-route-map-placeholder"
+      >
         <p>Activa tu ubicacion para ver la ruta a pie hasta la farmacia mas cercana.</p>
       </div>
     );
   }
 
   return (
-    <div className={styles.wrapper} data-testid="mini-route-map">
+    <div
+      className={`${styles.wrapper} ${variant === "floating" ? styles.wrapperFloating : ""}`}
+      data-testid="mini-route-map"
+    >
       <MapContainer
         center={[userLocation.latitude, userLocation.longitude]}
         zoom={14}
         scrollWheelZoom={false}
-        dragging={false}
+        dragging
         doubleClickZoom={false}
         touchZoom={false}
         zoomControl={false}
