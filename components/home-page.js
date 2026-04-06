@@ -38,6 +38,7 @@ export default function HomePage() {
   const [permissionState, setPermissionState] = useState("prompt");
   const [location, setLocation] = useState(null);
   const [locationLabelResolved, setLocationLabelResolved] = useState("");
+  const [requiresManualLocationRequest, setRequiresManualLocationRequest] = useState(false);
   const [view, setView] = useState("list");
   const [pharmacies, setPharmacies] = useState([]);
   const [selectedPharmacyKey, setSelectedPharmacyKey] = useState(null);
@@ -49,6 +50,16 @@ export default function HomePage() {
     pharmacies.find((pharmacy) => pharmacyKey(pharmacy) === selectedPharmacyKey) ?? nearest ?? null;
 
   useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIos = /iphone|ipad|ipod/.test(userAgent);
+    const isSafari = /safari/.test(userAgent) && !/crios|fxios|edgios|chrome/.test(userAgent);
+
+    if (isIos && isSafari) {
+      setRequiresManualLocationRequest(true);
+      loadTurnos();
+      return;
+    }
+
     requestLocation();
   }, []);
 
@@ -161,7 +172,11 @@ export default function HomePage() {
       },
       () => {
         setPermissionState("denied");
-        setError("No pudimos acceder a tu ubicación. Te mostramos igual el turno del día.");
+        setError(
+          requiresManualLocationRequest
+            ? "No pudimos acceder a tu ubicacion. En iPhone usa este boton desde Safari o desde la app instalada."
+            : "No pudimos acceder a tu ubicación. Te mostramos igual el turno del día."
+        );
         loadTurnos();
       },
       {
@@ -205,8 +220,12 @@ export default function HomePage() {
       return "Este navegador no expone geolocalizacion.";
     }
 
+    if (requiresManualLocationRequest) {
+      return "En iPhone y Safari, toca el boton para habilitar ubicacion.";
+    }
+
     return "La app intenta pedir ubicacion al abrir.";
-  }, [location, locationLabelResolved, permissionState]);
+  }, [location, locationLabelResolved, permissionState, requiresManualLocationRequest]);
 
   return (
     <main className={styles.page}>

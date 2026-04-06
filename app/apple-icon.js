@@ -17,15 +17,53 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#f4eee1",
-          color: "#151515",
-          fontSize: 74,
-          fontWeight: 800,
-          border: "10px solid #151515",
-          letterSpacing: "-0.08em"
+          background: "linear-gradient(180deg, #fbf7ef 0%, #efe6d6 100%)"
         }}
       >
-        LP
+        <div
+          style={{
+            width: 146,
+            height: 146,
+            borderRadius: 34,
+            background: "#fffaf2",
+            border: "6px solid #151515",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative"
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              width: 24,
+              height: 84,
+              background: "#d14b2f",
+              borderRadius: 8
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              width: 84,
+              height: 24,
+              background: "#d14b2f",
+              borderRadius: 8
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              bottom: 10,
+              fontSize: 18,
+              fontWeight: 800,
+              color: "#151515",
+              letterSpacing: "-0.08em"
+            }}
+          >
+            LP
+          </div>
+        </div>
       </div>
     ),
     size
