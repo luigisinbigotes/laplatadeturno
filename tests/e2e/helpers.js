@@ -14,7 +14,7 @@ export async function requestLocation(page) {
 }
 
 export function pharmacyCards(page) {
-  return page.locator("[data-testid^='pharmacy-card-']");
+  return page.locator("article[role='button'][data-testid^='pharmacy-card-']");
 }
 
 export async function extractCard(cardLocator) {

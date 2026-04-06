@@ -18,7 +18,7 @@ test.describe("La Plata DeTurno", () => {
     await expect(page.getByTestId("map-view-button")).toBeVisible();
 
     if (browserName === "chromium") {
-      await expect(page.getByTestId("install-prompt")).toBeVisible();
+      await expect(page.getByTestId("location-button")).toBeVisible();
     }
   });
 
