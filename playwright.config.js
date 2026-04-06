@@ -1,6 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || "https://laplatadeturno.vercel.app";
+const videoMode = process.env.PLAYWRIGHT_VIDEO || "retain-on-failure";
+const screenshotMode = process.env.PLAYWRIGHT_SCREENSHOT || "only-on-failure";
+const traceMode = process.env.PLAYWRIGHT_TRACE || "on-first-retry";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -11,9 +14,9 @@ export default defineConfig({
   reporter: process.env.CI ? [["html"], ["github"]] : [["list"], ["html"]],
   use: {
     baseURL,
-    trace: "on-first-retry",
-    screenshot: "only-on-failure",
-    video: "retain-on-failure"
+    trace: traceMode,
+    screenshot: screenshotMode,
+    video: videoMode
   },
   projects: [
     {

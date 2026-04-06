@@ -2,6 +2,12 @@ name: Playwright
 
 on:
   workflow_dispatch:
+    inputs:
+      record_videos:
+        description: "Record videos for all tests and upload them as artifacts"
+        required: false
+        default: false
+        type: boolean
   push:
     branches:
       - main
@@ -30,6 +36,9 @@ jobs:
       - name: Run Playwright tests against prod
         env:
           PLAYWRIGHT_BASE_URL: https://laplatadeturno.vercel.app
+          PLAYWRIGHT_VIDEO: ${{ inputs.record_videos && 'on' || 'retain-on-failure' }}
+          PLAYWRIGHT_SCREENSHOT: only-on-failure
+          PLAYWRIGHT_TRACE: on-first-retry
         run: npm run test:e2e
 
       - name: Upload Playwright report
@@ -38,4 +47,12 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report
+          retention-days: 7
+
+      - name: Upload Playwright videos and raw results
+        if: always() && inputs.record_videos
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: test-results
           retention-days: 7
