@@ -57,7 +57,6 @@ test.describe("La Plata DeTurno", () => {
 
     const cards = pharmacyCards(page);
     await expect(cards.first()).toBeVisible();
-    const nearest = await extractCard(cards.first());
     const selected = await extractCard(cards.nth(1));
 
     await cards.nth(1).click();
@@ -67,9 +66,11 @@ test.describe("La Plata DeTurno", () => {
     expect(banner.title).toBe(selected.title);
 
     await page.getByTestId("reset-selection-button").click();
+    await expect(cards.first()).toBeVisible();
+    const nearestAfterReset = await extractCard(cards.first());
     banner = await extractBanner(page);
     expect(banner.label.toLowerCase()).toContain("mas cercana ahora");
-    expect(banner.title).toBe(nearest.title);
+    expect(banner.title).toBe(nearestAfterReset.title);
   });
 
   test("renders dark mode without losing key content", async ({ page }, testInfo) => {
