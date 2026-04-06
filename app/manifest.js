@@ -5,23 +5,23 @@ export default function manifest() {
     description: "Farmacias de turno cercanas en La Plata",
     start_url: "/",
     display: "standalone",
-    background_color: "#f4eee1",
-    theme_color: "#f4eee1",
+    background_color: "#efe6d6",
+    theme_color: "#efe6d6",
     lang: "es-AR",
     orientation: "portrait",
     icons: [
       {
-        src: "/icon?size=192",
+        src: "/icon?size=192&v=2",
         sizes: "192x192",
         type: "image/png"
       },
       {
-        src: "/icon?size=512",
+        src: "/icon?size=512&v=2",
         sizes: "512x512",
         type: "image/png"
       },
       {
-        src: "/apple-icon",
+        src: "/apple-icon?v=2",
         sizes: "180x180",
         type: "image/png"
       }

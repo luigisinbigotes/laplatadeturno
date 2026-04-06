@@ -5,6 +5,11 @@ export const metadata = {
   title: "La Plata DeTurno",
   description: "Farmacias de turno cercanas en La Plata",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icon?v=2",
+    apple: "/apple-icon?v=2",
+    shortcut: "/icon?v=2"
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -16,7 +21,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#f4eee1"
+  themeColor: "#efe6d6"
 };
 
 export default function RootLayout({ children }) {

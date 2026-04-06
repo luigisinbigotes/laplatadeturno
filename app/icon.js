@@ -24,7 +24,7 @@ export default function Icon() {
           style={{
             width: 408,
             height: 408,
-            borderRadius: 96,
+            borderRadius: 0,
             background: "#fffaf2",
             border: "14px solid #151515",
             display: "flex",
@@ -39,8 +39,8 @@ export default function Icon() {
               position: "absolute",
               width: 84,
               height: 248,
-              background: "#d14b2f",
-              borderRadius: 28
+              background: "#2f8f63",
+              borderRadius: 0
             }}
           />
           <div
@@ -48,22 +48,10 @@ export default function Icon() {
               position: "absolute",
               width: 248,
               height: 84,
-              background: "#d14b2f",
-              borderRadius: 28
+              background: "#2f8f63",
+              borderRadius: 0
             }}
           />
-          <div
-            style={{
-              position: "absolute",
-              bottom: 42,
-              fontSize: 42,
-              fontWeight: 800,
-              color: "#151515",
-              letterSpacing: "-0.08em"
-            }}
-          >
-            LP
-          </div>
         </div>
       </div>
     ),
