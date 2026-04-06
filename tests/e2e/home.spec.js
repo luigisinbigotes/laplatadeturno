@@ -1,9 +1,12 @@
 import { expect, test } from "@playwright/test";
-
-async function waitForHydration(page) {
-  await page.waitForLoadState("networkidle");
-  await page.locator("main").waitFor({ state: "visible" });
-}
+import {
+  extractBanner,
+  extractCard,
+  parseDistanceMeters,
+  pharmacyCards,
+  requestLocation,
+  waitForHydration
+} from "./helpers";
 
 test.describe("La Plata DeTurno", () => {
   test("loads home and shows the day-turn panel", async ({ page, browserName }) => {
@@ -22,13 +25,21 @@ test.describe("La Plata DeTurno", () => {
   test("uses geolocation and surfaces a closest pharmacy", async ({ page }) => {
     await page.goto("/");
     await waitForHydration(page);
+    await requestLocation(page);
 
-    const locationButton = page.getByRole("button", { name: /usar mi ubicacion|actualizar ubicacion/i });
-    await locationButton.click();
+    const cards = pharmacyCards(page);
+    await expect(cards.first()).toBeVisible();
+    await expect(cards.nth(1)).toBeVisible();
 
-    await expect(page.getByText(/ubicacion aproximada:/i)).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(/mas cercana ahora|farmacia seleccionada/i)).toBeVisible();
-    await expect(page.getByText(/m|km/).first()).toBeVisible();
+    const firstCard = await extractCard(cards.first());
+    const secondCard = await extractCard(cards.nth(1));
+    const banner = await extractBanner(page);
+
+    expect(banner.label.toLowerCase()).toContain("mas cercana ahora");
+    expect(banner.title).toBe(firstCard.title);
+    expect(parseDistanceMeters(firstCard.distanceText)).toBeLessThanOrEqual(
+      parseDistanceMeters(secondCard.distanceText)
+    );
   });
 
   test("can switch to map view", async ({ page }) => {
@@ -42,17 +53,23 @@ test.describe("La Plata DeTurno", () => {
   test("can select a pharmacy and return to the closest one", async ({ page }) => {
     await page.goto("/");
     await waitForHydration(page);
+    await requestLocation(page);
 
-    await page.getByRole("button", { name: /usar mi ubicacion|actualizar ubicacion/i }).click();
-    await expect(page.getByText(/ubicacion aproximada:/i)).toBeVisible({ timeout: 15000 });
-
-    const cards = page.locator("article[role='button']");
+    const cards = pharmacyCards(page);
     await expect(cards.first()).toBeVisible();
+    const nearest = await extractCard(cards.first());
+    const selected = await extractCard(cards.nth(1));
+
     await cards.nth(1).click();
 
-    await expect(page.getByText(/farmacia seleccionada/i)).toBeVisible();
+    let banner = await extractBanner(page);
+    expect(banner.label.toLowerCase()).toContain("farmacia seleccionada");
+    expect(banner.title).toBe(selected.title);
+
     await page.getByRole("button", { name: /volver a la mas cercana/i }).click();
-    await expect(page.getByText(/mas cercana ahora/i)).toBeVisible();
+    banner = await extractBanner(page);
+    expect(banner.label.toLowerCase()).toContain("mas cercana ahora");
+    expect(banner.title).toBe(nearest.title);
   });
 
   test("renders dark mode without losing key content", async ({ page }, testInfo) => {
