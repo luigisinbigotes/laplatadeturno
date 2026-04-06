@@ -2,36 +2,38 @@ import { expect } from "@playwright/test";
 
 export async function waitForHydration(page) {
   await page.waitForLoadState("networkidle");
-  await page.locator("main").waitFor({ state: "visible" });
+  await page.getByTestId("home-page").waitFor({ state: "visible" });
 }
 
 export async function requestLocation(page) {
-  const locationButton = page.getByRole("button", { name: /usar mi ubicacion|actualizar ubicacion/i });
+  const locationButton = page.getByTestId("location-button");
   await locationButton.click();
-  await expect(page.getByText(/ubicacion aproximada:/i)).toBeVisible({ timeout: 15000 });
+  await expect(page.getByTestId("location-state")).toContainText(/ubicacion aproximada:/i, {
+    timeout: 15000
+  });
 }
 
 export function pharmacyCards(page) {
-  return page.locator("article[role='button']");
+  return page.locator("[data-testid^='pharmacy-card-']");
 }
 
 export async function extractCard(cardLocator) {
-  const title = (await cardLocator.locator("h3").textContent())?.trim() ?? "";
-  const paragraphs = await cardLocator.locator("p").allTextContents();
-  const lines = paragraphs.map((value) => value.trim()).filter(Boolean);
-  const distanceText = lines.find((value) => /(\d+(\.\d+)?\s?km|\d+\s?m)$/i.test(value)) ?? "";
+  const title = ((await cardLocator.getByTestId("pharmacy-card-name").textContent()) ?? "").trim();
+  const address = ((await cardLocator.getByTestId("pharmacy-card-address").textContent()) ?? "").trim();
+  const meta = ((await cardLocator.getByTestId("pharmacy-card-meta").textContent()) ?? "").trim();
+  const distanceLocator = cardLocator.getByTestId("pharmacy-card-distance");
+  const distanceText = (await distanceLocator.count()) ? ((await distanceLocator.textContent()) ?? "").trim() : "";
 
   return {
     title,
-    lines,
+    lines: [address, meta, distanceText].filter(Boolean),
     distanceText
   };
 }
 
 export async function extractBanner(page) {
-  const hero = page.locator("section").first();
-  const label = ((await hero.locator("span").first().textContent()) ?? "").trim();
-  const title = ((await hero.locator("strong").first().textContent()) ?? "").trim();
+  const label = ((await page.getByTestId("active-pharmacy-label").textContent()) ?? "").trim();
+  const title = ((await page.getByTestId("active-pharmacy-name").textContent()) ?? "").trim();
 
   return {
     label,

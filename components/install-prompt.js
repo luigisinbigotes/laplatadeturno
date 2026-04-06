@@ -74,23 +74,27 @@ export default function InstallPrompt() {
   }
 
   return (
-    <aside className={styles.banner}>
+    <aside className={styles.banner} data-testid="install-prompt">
       <div className={styles.copy}>
-        <p className={styles.kicker}>Instalar app</p>
+        <p className={styles.kicker} data-testid="install-prompt-kicker">Instalar app</p>
         {platform === "ios" ? (
-          <p className={styles.text}>En Safari: Compartir, luego Agregar a pantalla de inicio.</p>
+          <p className={styles.text} data-testid="install-prompt-text">
+            En Safari: Compartir, luego Agregar a pantalla de inicio.
+          </p>
         ) : (
-          <p className={styles.text}>Instalala para abrirla como app y usarla mas rapido desde el telefono.</p>
+          <p className={styles.text} data-testid="install-prompt-text">
+            Instalala para abrirla como app y usarla mas rapido desde el telefono.
+          </p>
         )}
       </div>
 
       <div className={styles.actions}>
         {platform === "android" ? (
-          <button className={styles.primary} onClick={installApp}>
+          <button className={styles.primary} onClick={installApp} data-testid="install-prompt-install">
             Instalar
           </button>
         ) : null}
-        <button className={styles.secondary} onClick={() => setDismissed(true)}>
+        <button className={styles.secondary} onClick={() => setDismissed(true)} data-testid="install-prompt-close">
           Cerrar
         </button>
       </div>

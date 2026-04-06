@@ -115,14 +115,14 @@ export default function MiniRouteMap({ userLocation, pharmacy, canRoute }) {
 
   if (!userLocation || !destination || !canRoute) {
     return (
-      <div className={styles.placeholder}>
+      <div className={styles.placeholder} data-testid="mini-route-map-placeholder">
         <p>Activa tu ubicacion para ver la ruta a pie hasta la farmacia mas cercana.</p>
       </div>
     );
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-testid="mini-route-map">
       <MapContainer
         center={[userLocation.latitude, userLocation.longitude]}
         zoom={14}
@@ -150,7 +150,7 @@ export default function MiniRouteMap({ userLocation, pharmacy, canRoute }) {
         ) : null}
         <FitBounds points={routePoints.length ? routePoints : mapPoints} />
       </MapContainer>
-      <div className={styles.caption}>
+      <div className={styles.caption} data-testid="mini-route-map-caption">
         {routeStatus === "loading" ? "Buscando recorrido peatonal..." : null}
         {routeStatus === "fallback" ? "Vista aproximada: linea directa hasta la farmacia." : null}
         {routeStatus === "ready" ? "Recorrido peatonal estimado hasta la farmacia." : null}

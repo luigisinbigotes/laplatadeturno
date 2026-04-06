@@ -230,44 +230,61 @@ export default function HomePage() {
   }, [location, locationLabelResolved, permissionState, requiresManualLocationRequest]);
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-testid="home-page">
       <SplashScreen />
       <InstallPrompt />
-      <section className={styles.hero}>
-        <div className={styles.heroCard}>
+      <section className={styles.hero} data-testid="hero-section">
+        <div className={styles.heroCard} data-testid="hero-card">
           <div className={styles.heroContent}>
-            <div className={styles.heroMain}>
-              <span className={styles.cardLabel}>
+            <div className={styles.heroMain} data-testid="hero-main">
+              <span className={styles.cardLabel} data-testid="active-pharmacy-label">
                 {activePharmacy && nearest && pharmacyKey(activePharmacy) !== pharmacyKey(nearest)
                   ? "Farmacia seleccionada"
                   : "Mas cercana ahora"}
               </span>
-              <strong>{activePharmacy ? activePharmacy.name : "Cargando turnos..."}</strong>
-              <p>{activePharmacy ? activePharmacy.address : "Consultando fuente oficial..."}</p>
-              <span>
+              <strong data-testid="active-pharmacy-name">
+                {activePharmacy ? activePharmacy.name : "Cargando turnos..."}
+              </strong>
+              <p data-testid="active-pharmacy-address">
+                {activePharmacy ? activePharmacy.address : "Consultando fuente oficial..."}
+              </p>
+              <span data-testid="active-pharmacy-distance">
                 {activePharmacy?.distanceKm != null
                   ? formatDistance(activePharmacy.distanceKm)
                   : "Sin calculo de cercania"}
               </span>
               <div className={styles.actions}>
-                <button className={styles.primaryButton} onClick={requestLocation}>
+                <button
+                  className={styles.primaryButton}
+                  onClick={requestLocation}
+                  data-testid="location-button"
+                >
                   {permissionState === "granted" ? "Actualizar ubicacion" : "Usar mi ubicacion"}
                 </button>
               </div>
-              <p className={styles.summary}>{summaryText}</p>
+              <p className={styles.summary} data-testid="summary-text">
+                {summaryText}
+              </p>
               {activePharmacy && nearest && pharmacyKey(activePharmacy) !== pharmacyKey(nearest) ? (
                 <button
                   className={styles.resetSelectionButton}
                   onClick={() => setSelectedPharmacyKey(pharmacyKey(nearest))}
+                  data-testid="reset-selection-button"
                 >
                   Volver a la mas cercana
                 </button>
               ) : null}
-              <p className={styles.locationState}>{locationLabel}</p>
-              {error ? <p className={styles.error}>{error}</p> : null}
+              <p className={styles.locationState} data-testid="location-state">
+                {locationLabel}
+              </p>
+              {error ? (
+                <p className={styles.error} data-testid="error-message">
+                  {error}
+                </p>
+              ) : null}
             </div>
 
-            <div className={styles.heroMap}>
+            <div className={styles.heroMap} data-testid="hero-mini-map">
               <MiniRouteMap
                 userLocation={location}
                 pharmacy={activePharmacy}
@@ -278,34 +295,40 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className={styles.panel}>
+      <section className={styles.panel} data-testid="turno-panel">
         <div className={styles.panelHeader}>
           <div>
             <h2>Turno del dia</h2>
             <p>Fuente oficial: Colegio de Farmaceuticos de La Plata.</p>
           </div>
-          <div className={styles.toggle}>
+          <div className={styles.toggle} data-testid="view-toggle">
             <button
               className={view === "list" ? styles.toggleActive : ""}
               onClick={() => setView("list")}
+              data-testid="list-view-button"
             >
               Lista
             </button>
             <button
               className={view === "map" ? styles.toggleActive : ""}
               onClick={() => setView("map")}
+              data-testid="map-view-button"
             >
               Mapa
             </button>
           </div>
         </div>
 
-        {loading ? <p className={styles.loading}>Actualizando farmacias de turno...</p> : null}
+        {loading ? (
+          <p className={styles.loading} data-testid="loading-message">
+            Actualizando farmacias de turno...
+          </p>
+        ) : null}
 
         {view === "map" ? (
           <TurnoMap pharmacies={pharmacies} userLocation={location ?? defaultCenter} />
         ) : (
-          <div className={styles.list}>
+          <div className={styles.list} data-testid="pharmacy-list">
             {pharmacies.map((pharmacy, index) => (
               <article
                 className={`${styles.item} ${
@@ -315,6 +338,8 @@ export default function HomePage() {
                 onClick={() => setSelectedPharmacyKey(pharmacyKey(pharmacy))}
                 role="button"
                 tabIndex={0}
+                data-testid={`pharmacy-card-${index}`}
+                data-pharmacy-key={pharmacyKey(pharmacy)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
@@ -322,17 +347,26 @@ export default function HomePage() {
                   }
                 }}
               >
-                <div className={styles.itemIndex}>{index + 1}</div>
+                <div className={styles.itemIndex} data-testid="pharmacy-card-index">
+                  {index + 1}
+                </div>
                 <div className={styles.itemBody}>
-                  <h3>{pharmacy.name}</h3>
-                  <p>{pharmacy.address}</p>
-                  <p>
+                  <h3 data-testid="pharmacy-card-name">{pharmacy.name}</h3>
+                  <p data-testid="pharmacy-card-address">{pharmacy.address}</p>
+                  <p data-testid="pharmacy-card-meta">
                     {pharmacy.zone} {pharmacy.phone ? `· ${pharmacy.phone}` : ""}
                   </p>
                 </div>
                 <div className={styles.itemMeta}>
-                  {permissionState === "granted" ? <span>{formatDistance(pharmacy.distanceKm)}</span> : null}
-                  <a href={pharmacy.mapUrl} target="_blank" rel="noreferrer">
+                  {permissionState === "granted" ? (
+                    <span data-testid="pharmacy-card-distance">{formatDistance(pharmacy.distanceKm)}</span>
+                  ) : null}
+                  <a
+                    href={pharmacy.mapUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    data-testid="pharmacy-card-directions"
+                  >
                     Como llegar
                   </a>
                 </div>

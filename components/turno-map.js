@@ -24,7 +24,7 @@ export default function TurnoMap({ pharmacies, userLocation }) {
       : [-34.9205, -57.9536];
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-testid="turno-map">
       <MapContainer center={center} zoom={12} scrollWheelZoom className={styles.map}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

@@ -14,11 +14,11 @@ test.describe("La Plata DeTurno", () => {
     await waitForHydration(page);
 
     await expect(page.getByRole("heading", { name: "Turno del dia" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /lista/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /mapa/i })).toBeVisible();
+    await expect(page.getByTestId("list-view-button")).toBeVisible();
+    await expect(page.getByTestId("map-view-button")).toBeVisible();
 
     if (browserName === "chromium") {
-      await expect(page.getByText(/instalar app/i)).toBeVisible();
+      await expect(page.getByTestId("install-prompt")).toBeVisible();
     }
   });
 
@@ -46,8 +46,8 @@ test.describe("La Plata DeTurno", () => {
     await page.goto("/");
     await waitForHydration(page);
 
-    await page.getByRole("button", { name: /mapa/i }).click();
-    await expect(page.locator(".leaflet-container").first()).toBeVisible();
+    await page.getByTestId("map-view-button").click();
+    await expect(page.getByTestId("turno-map")).toBeVisible();
   });
 
   test("can select a pharmacy and return to the closest one", async ({ page }) => {
@@ -66,7 +66,7 @@ test.describe("La Plata DeTurno", () => {
     expect(banner.label.toLowerCase()).toContain("farmacia seleccionada");
     expect(banner.title).toBe(selected.title);
 
-    await page.getByRole("button", { name: /volver a la mas cercana/i }).click();
+    await page.getByTestId("reset-selection-button").click();
     banner = await extractBanner(page);
     expect(banner.label.toLowerCase()).toContain("mas cercana ahora");
     expect(banner.title).toBe(nearest.title);
@@ -79,6 +79,6 @@ test.describe("La Plata DeTurno", () => {
     await waitForHydration(page);
 
     await expect(page.getByRole("heading", { name: "Turno del dia" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /usar mi ubicacion/i })).toBeVisible();
+    await expect(page.getByTestId("location-button")).toBeVisible();
   });
 });
