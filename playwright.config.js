@@ -11,7 +11,9 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   failOnFlakyTests: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  reporter: process.env.CI ? [["html"], ["github"]] : [["list"], ["html"]],
+  reporter: process.env.CI
+    ? [["html"], ["github"], ["json", { outputFile: "playwright-report/results.json" }]]
+    : [["list"], ["html"]],
   use: {
     baseURL,
     trace: traceMode,

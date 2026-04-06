@@ -41,6 +41,10 @@ jobs:
           PLAYWRIGHT_TRACE: on-first-retry
         run: npm run test:e2e
 
+      - name: Write Playwright summary to workflow page
+        if: always()
+        run: node scripts/write_playwright_summary.mjs
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
