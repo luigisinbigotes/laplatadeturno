@@ -226,7 +226,7 @@ export default function HomePage() {
       return "En iPhone y Safari, toca el boton para habilitar ubicacion.";
     }
 
-    return "La app intenta pedir ubicacion al abrir.";
+    return "Usa el boton para compartir tu ubicacion y ordenar por cercania.";
   }, [location, locationLabelResolved, permissionState, requiresManualLocationRequest]);
 
   return (
