@@ -6,7 +6,7 @@ const nextConfig = {
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://www.google.com",
+      "img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://www.google.com",
       "font-src 'self' https://fonts.gstatic.com",
       "connect-src 'self' https://routing.openstreetmap.de https://nominatim.openstreetmap.org https://www.colfarmalp.org.ar https://*.tile.openstreetmap.org",
       "object-src 'none'",
