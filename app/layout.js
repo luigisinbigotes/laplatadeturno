@@ -12,7 +12,7 @@ export const metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "La Plata DeTurno"
   },
   formatDetection: {
@@ -22,9 +22,14 @@ export const metadata = {
 
 export const viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#efe6d6" },
-    { media: "(prefers-color-scheme: dark)", color: "#131313" }
-  ]
+    { media: "(prefers-color-scheme: light)", color: "#f1ecdf" },
+    { media: "(prefers-color-scheme: dark)", color: "#121110" }
+  ],
+  viewportFit: "cover",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false
 };
 
 export default function RootLayout({ children }) {

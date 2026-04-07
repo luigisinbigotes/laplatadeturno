@@ -29,6 +29,7 @@
 
 * {
   box-sizing: border-box;
+  accent-color: var(--primary);
 }
 
 html,
@@ -46,6 +47,11 @@ body {
   background-size: 140px 140px, 180px 180px, 160px 160px, 220px 220px, 100% 100%, 100% 100%;
   color: var(--text);
   position: relative;
+  /* Support for iOS status bar blend */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 body::after {
