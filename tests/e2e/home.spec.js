@@ -120,15 +120,85 @@ test.describe("La Plata DeTurno", () => {
       .toBe(0);
   });
 
-  test("scrolls back to the hero when selecting a different pharmacy from the list", async ({ page }) => {
+  test("keeps list context when selecting a different pharmacy with the floating mini map visible", async ({
+    page
+  }) => {
     await page.goto("/");
     await waitForHydration(page);
     await requestLocation(page);
     await waitForLocatedResults(page);
 
     const cards = pharmacyCards(page);
-    await expect(cards.nth(1)).toBeVisible();
     await scrollToBottom(page);
+    await expect(page.getByTestId("floating-mini-map")).toBeVisible();
+    await expect(cards.nth(1)).toBeVisible();
+    const selected = await extractCard(cards.nth(1));
+
+    const beforeSelectionY = await page.evaluate(() => window.scrollY);
+    await cards.nth(1).click();
+
+    await expect
+      .poll(async () => {
+        const banner = await extractBanner(page);
+        return banner.title;
+      })
+      .toBe(selected.title);
+
+    await expect
+      .poll(async () => {
+        return await page.evaluate(() => window.scrollY);
+      })
+      .toBeGreaterThan(beforeSelectionY - 120);
+  });
+
+  test("scrolls back to the hero when the floating mini map is tapped", async ({ page }) => {
+    await page.goto("/");
+    await waitForHydration(page);
+    await requestLocation(page);
+    await waitForLocatedResults(page);
+
+    await scrollToBottom(page);
+    await expect(page.getByTestId("floating-mini-map")).toBeVisible();
+
+    await page.getByTestId("floating-mini-map").click();
+
+    await expect
+      .poll(async () => {
+        const box = await page.getByTestId("hero-section").boundingBox();
+        return box?.y ?? Number.POSITIVE_INFINITY;
+      })
+      .toBeLessThan(40);
+  });
+
+  test("shows clickable phone links in the selected pharmacy and list when available", async ({ page }) => {
+    await page.goto("/");
+    await waitForHydration(page);
+    await requestLocation(page);
+    await waitForLocatedResults(page);
+
+    const cards = pharmacyCards(page);
+    const cardsWithPhone = cards.filter({ has: page.getByTestId("pharmacy-card-phone") });
+    await expect(cardsWithPhone.first()).toBeVisible();
+
+    const firstPhoneCard = cardsWithPhone.first();
+    const phoneHref = await firstPhoneCard.getByTestId("pharmacy-card-phone").getAttribute("href");
+    expect(phoneHref).toMatch(/^tel:\+/);
+
+    await firstPhoneCard.click();
+    await expect
+      .poll(async () => await page.getByTestId("active-pharmacy-phone").getAttribute("href"))
+      .toBe(phoneHref);
+  });
+
+  test("scrolls back to the hero when selecting a pharmacy on mobile", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "This test only applies to mobile as desktop behavior is already covered.");
+    await page.goto("/");
+    await waitForHydration(page);
+    await requestLocation(page);
+    await waitForLocatedResults(page);
+
+    const cards = pharmacyCards(page);
+    await cards.nth(1).scrollIntoViewIfNeeded();
     await cards.nth(1).click();
 
     await expect

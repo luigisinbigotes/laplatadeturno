@@ -171,6 +171,17 @@
   max-width: 40ch;
 }
 
+.heroPhone {
+  margin-top: 10px;
+  width: fit-content;
+  color: var(--primary-strong);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
 .miniMapSkeleton {
   min-height: 220px;
   display: grid;
@@ -295,6 +306,15 @@
   line-height: 1.45;
 }
 
+.itemPhone {
+  margin-top: 6px;
+  width: fit-content;
+  color: var(--primary-strong);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
 .itemMeta {
   display: flex;
   flex-direction: column;
@@ -326,6 +346,10 @@
   z-index: 60;
   filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.5));
   animation: floatMiniMapIn 420ms cubic-bezier(0.2, 0.9, 0.25, 1);
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 @keyframes floatMiniMapIn {
@@ -398,7 +422,7 @@
   .page {
     width: 100%;
     margin: 0;
-    padding: 0 0 32px;
+    padding: 0 0 80px;
   }
 
   .hero {
@@ -408,8 +432,6 @@
   .heroCard {
     padding: 18px 14px;
     overflow: hidden;
-    border: 0;
-    box-shadow: none;
   }
 
   .heroMain {
@@ -428,17 +450,6 @@
 
   .panel {
     padding: 18px 14px;
-    border: 0;
-    box-shadow: none;
-  }
-
-  .item,
-  .toggle,
-  .miniMapSkeleton,
-  .primaryButton,
-  .secondaryButton {
-    border: 0;
-    box-shadow: none;
   }
 
   .panelHeader h2 {
@@ -467,7 +478,6 @@
 
   .toggle button {
     flex: 1;
-    border: 0;
     padding: 11px 10px;
     font-size: 0.74rem;
   }
@@ -482,11 +492,12 @@
       "index title"
       "index address"
       "index meta"
+      "index phone"
       "distance distance"
       "action action";
     gap: 0 12px;
     padding: 14px 12px 12px;
-    border-radius: 16px;
+    border-radius: 0;
     background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 58%, transparent) 0%, color-mix(in srgb, var(--panel-soft) 90%, transparent) 100%);
   }
 
@@ -494,7 +505,7 @@
     grid-area: index;
     width: 40px;
     height: 40px;
-    border-radius: 12px;
+    border-radius: 0;
     font-size: 1rem;
   }
 
@@ -524,6 +535,13 @@
     color: color-mix(in srgb, var(--muted) 82%, transparent);
   }
 
+  .itemPhone {
+    grid-area: phone;
+    margin-top: 6px;
+    font-size: 0.88rem;
+    line-height: 1.2;
+  }
+
   .itemMeta {
     display: contents;
   }
@@ -534,7 +552,7 @@
     display: inline-flex;
     width: fit-content;
     padding: 6px 10px;
-    border-radius: 999px;
+    border-radius: 0;
     background: color-mix(in srgb, var(--primary) 14%, transparent);
     color: var(--text);
     font-weight: 700;

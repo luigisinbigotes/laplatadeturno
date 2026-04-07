@@ -26,7 +26,7 @@ function buildApproximateAddress(address) {
 }
 
 export async function GET(request) {
-  const rateLimited = applyRateLimit(request, "reverse-geocode", 30, 60 * 1000);
+  const rateLimited = applyRateLimit(request, "reverse-geocode", 300, 60 * 1000);
   if (rateLimited) {
     return rateLimited;
   }

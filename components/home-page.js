@@ -28,7 +28,7 @@ const defaultCenter = {
 
 function formatDistance(distanceKm) {
   if (distanceKm == null) {
-    return "s/d";
+    return null;
   }
 
   if (distanceKm < 1) {
@@ -84,13 +84,12 @@ export default function HomePage() {
         const nextFloating =
           view === "list" &&
           !showManualLocationPicker &&
-          entry.intersectionRatio < 0.35 &&
-          !entry.isIntersecting;
+          entry.intersectionRatio < 0.2;
 
         setShowFloatingMiniMap(nextFloating);
       },
       {
-        threshold: [0, 0.2, 0.35, 0.5]
+        threshold: [0, 0.05, 0.2, 0.5]
       }
     );
 
@@ -265,6 +264,16 @@ export default function HomePage() {
     }
 
     setSelectedPharmacyKey(nextKey);
+
+    if (!(showFloatingMiniMap && view === "list")) {
+      heroSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  }
+
+  function scrollToHero() {
     heroSectionRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "start"
@@ -338,11 +347,20 @@ export default function HomePage() {
               <p data-testid="active-pharmacy-address">
                 {activePharmacy ? activePharmacy.address : "Consultando fuente oficial..."}
               </p>
-              <span data-testid="active-pharmacy-distance">
-                {activePharmacy?.distanceKm != null
-                  ? formatDistance(activePharmacy.distanceKm)
-                  : "Sin calculo de cercania"}
-              </span>
+              {activePharmacy?.phone ? (
+                <a
+                  className={styles.heroPhone}
+                  href={buildPhoneHref(activePharmacy.phone)}
+                  data-testid="active-pharmacy-phone"
+                >
+                  {formatPhoneDisplay(activePharmacy.phone)}
+                </a>
+              ) : null}
+              {hasUsableLocation && activePharmacy?.distanceKm != null ? (
+                <span data-testid="active-pharmacy-distance">
+                  {formatDistance(activePharmacy.distanceKm)}
+                </span>
+              ) : null}
               <div className={styles.actions}>
                 <button
                   className={styles.primaryButton}
@@ -351,7 +369,7 @@ export default function HomePage() {
                 >
                   {hasUsableLocation ? "Actualizar ubicacion" : "Usar mi ubicacion"}
                 </button>
-                {(permissionState === "denied" || permissionState === "unsupported") && !hasUsableLocation ? (
+                {!hasUsableLocation ? (
                   <button
                     className={styles.secondaryButton}
                     onClick={openManualLocationPicker}
@@ -454,12 +472,20 @@ export default function HomePage() {
                 <div className={styles.itemBody}>
                   <h3 data-testid="pharmacy-card-name">{pharmacy.name}</h3>
                   <p data-testid="pharmacy-card-address">{pharmacy.address}</p>
-                  <p data-testid="pharmacy-card-meta">
-                    {pharmacy.zone} {pharmacy.phone ? `· ${pharmacy.phone}` : ""}
-                  </p>
+                  <p data-testid="pharmacy-card-meta">{pharmacy.zone}</p>
+                  {pharmacy.phone ? (
+                    <a
+                      className={styles.itemPhone}
+                      href={buildPhoneHref(pharmacy.phone)}
+                      onClick={(event) => event.stopPropagation()}
+                      data-testid="pharmacy-card-phone"
+                    >
+                      {formatPhoneDisplay(pharmacy.phone)}
+                    </a>
+                  ) : null}
                 </div>
                 <div className={styles.itemMeta}>
-                  {hasUsableLocation ? (
+                  {hasUsableLocation && pharmacy.distanceKm != null ? (
                     <span data-testid="pharmacy-card-distance">{formatDistance(pharmacy.distanceKm)}</span>
                   ) : null}
                   <a
@@ -484,7 +510,20 @@ export default function HomePage() {
         />
       ) : null}
       {showFloatingMiniMap && view === "list" ? (
-        <div className={styles.floatingMiniMap} data-testid="floating-mini-map">
+        <div
+          className={styles.floatingMiniMap}
+          data-testid="floating-mini-map"
+          onClick={scrollToHero}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              scrollToHero();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Ver detalles y mapa principal"
+        >
           <MiniRouteMap
             userLocation={location}
             pharmacy={activePharmacy}
@@ -499,4 +538,46 @@ export default function HomePage() {
 
 function pharmacyKey(pharmacy) {
   return `${pharmacy.name}-${pharmacy.address}`;
+}
+
+function normalizePhone(phone) {
+  const digits = String(phone ?? "").replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  if (digits.startsWith("54221")) {
+    return digits;
+  }
+
+  if (digits.startsWith("0221")) {
+    return `54${digits}`;
+  }
+
+  if (digits.startsWith("221") && digits.length >= 10) {
+    return `54${digits}`;
+  }
+
+  if (digits.length === 6 || digits.length === 7) {
+    return `54221${digits}`;
+  }
+
+  return digits.startsWith("54") ? digits : `54${digits}`;
+}
+
+function formatPhoneDisplay(phone) {
+  const normalized = normalizePhone(phone);
+  const local = normalized.startsWith("54221") ? normalized.slice(5) : normalized.replace(/^54/, "");
+
+  if (!local) {
+    return String(phone ?? "");
+  }
+
+  return `0221 ${local}`;
+}
+
+function buildPhoneHref(phone) {
+  const normalized = normalizePhone(phone);
+  return normalized ? `tel:+${normalized}` : "#";
 }
