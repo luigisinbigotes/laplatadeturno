@@ -277,8 +277,23 @@
 }
 
 .itemActive {
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--primary) 16%, transparent) 0%, color-mix(in srgb, var(--surface) 30%, transparent) 100%);
+  background: var(--text) !important;
+  border-color: var(--text);
+  box-shadow: 0 16px 32px color-mix(in srgb, var(--primary) 25%, transparent);
+  transform: translate(-2px, -2px);
+}
+
+.itemActive .itemBody h3,
+.itemActive .itemBody p,
+.itemActive .itemMeta span,
+.itemActive .itemMeta a,
+.itemActive .itemPhone {
+  color: var(--surface) !important;
+}
+
+.itemActive .itemIndex {
+  background: var(--surface);
+  color: var(--text);
 }
 
 .itemIndex {
