@@ -265,7 +265,8 @@ export default function HomePage() {
 
     setSelectedPharmacyKey(nextKey);
 
-    if (!(showFloatingMiniMap && view === "list")) {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 900;
+    if (!(showFloatingMiniMap && view === "list") && !isMobile) {
       heroSectionRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "start"

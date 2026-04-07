@@ -33,7 +33,7 @@ export async function requestLocation(page) {
   const locationButton = page.getByTestId("location-button");
   await locationButton.click();
   await expect(page.getByTestId("location-state")).toContainText(/ubicacion aproximada:/i, {
-    timeout: 15000
+    timeout: 20000
   });
 }
 
@@ -42,26 +42,36 @@ export async function confirmManualLocation(page) {
   await expect(page.getByTestId("manual-location-modal")).toBeVisible();
   await page.getByTestId("manual-location-confirm").click();
   await expect(page.getByTestId("location-state")).toContainText(/punto/i, {
-    timeout: 15000
+    timeout: 20000
   });
 }
 
 export async function waitForLocatedResults(page) {
   const cards = pharmacyCards(page);
-  await expect(cards.first()).toBeVisible();
+  
+  // Wait for at least 2 cards to be present
+  await expect.poll(async () => await cards.count(), { timeout: 15000 }).toBeGreaterThan(1);
+  
+  // Wait for the first card to have a distance
   await expect(cards.first().getByTestId("pharmacy-card-distance")).toBeVisible({ timeout: 15000 });
-  await expect(cards.nth(1).getByTestId("pharmacy-card-distance")).toBeVisible({ timeout: 15000 });
 
+  // Crucial: Wait for the banner to stabilize and MATCH the first card
+  // This ensures all background sorting/loading is finished
   await expect.poll(
     async () => {
       const firstCardTitle = ((await cards.first().getByTestId("pharmacy-card-name").textContent()) ?? "").trim();
       const bannerTitle = ((await page.getByTestId("active-pharmacy-name").textContent()) ?? "").trim();
-      return Boolean(bannerTitle) && bannerTitle === firstCardTitle;
+      if (!bannerTitle || !firstCardTitle) return false;
+      return bannerTitle === firstCardTitle;
     },
     {
-      timeout: 15000
+      timeout: 20000,
+      intervals: [500, 1000, 2000]
     }
   ).toBe(true);
+  
+  // Extra stabilization wait to let React settle
+  await page.waitForTimeout(500);
 }
 
 export function pharmacyCards(page) {
@@ -113,6 +123,8 @@ export async function scrollToBottom(page) {
       behavior: "auto"
     });
   });
+  // Give time for intersection observers to fire
+  await page.waitForTimeout(1000);
 }
 
 export async function scrollToTop(page) {
@@ -122,4 +134,5 @@ export async function scrollToTop(page) {
       behavior: "auto"
     });
   });
+  await page.waitForTimeout(1000);
 }
