@@ -140,7 +140,10 @@ export default function MiniRouteMap({ userLocation, pharmacy, canRoute, variant
         attributionControl={false}
         className={styles.map}
       >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        />
         <Marker position={[userLocation.latitude, userLocation.longitude]} icon={userIcon} />
         <Marker position={destination} icon={pharmacyIcon} />
         {routePoints.length ? (

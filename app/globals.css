@@ -88,6 +88,10 @@ body {
       linear-gradient(180deg, #161311 0%, #100e0d 100%);
     background-size: 140px 140px, 180px 180px, 160px 160px, 220px 220px, 100% 100%, 100% 100%;
   }
+
+  .leaflet-tile-container {
+    filter: grayscale(100%) invert(100%) brightness(0.8) contrast(1.2);
+  }
 }
 
 a {

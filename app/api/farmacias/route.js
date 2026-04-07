@@ -13,7 +13,7 @@ const pharmacyCache = new Map();
 const PHARMACY_CACHE_TTL_MS = 5 * 60 * 1000;
 
 export async function GET(request) {
-  const rateLimited = applyRateLimit(request, "farmacias", 300, 60 * 1000);
+  const rateLimited = applyRateLimit(request, "farmacias", 1000, 60 * 1000);
   if (rateLimited) {
     return rateLimited;
   }
