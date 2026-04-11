@@ -60,6 +60,21 @@ export default function HomePage() {
   const hasUsableLocation = permissionState === "granted" || permissionState === "manual";
 
   useEffect(() => {
+    const savedLocation = localStorage.getItem("deturno_last_location");
+    const savedPermission = localStorage.getItem("deturno_permission_state");
+
+    if (savedLocation && savedPermission) {
+      try {
+        const coords = JSON.parse(savedLocation);
+        setLocation(coords);
+        setPermissionState(savedPermission);
+        loadTurnos(coords);
+        return;
+      } catch (e) {
+        console.error("Failed to parse saved location", e);
+      }
+    }
+
     const userAgent = navigator.userAgent.toLowerCase();
     const isIos = /iphone|ipad|ipod/.test(userAgent);
     const isSafari = /safari/.test(userAgent) && !/crios|fxios|edgios|chrome/.test(userAgent);
@@ -180,6 +195,10 @@ export default function HomePage() {
     setLocation(coords);
     setPermissionState(nextPermissionState);
     setShowManualLocationPicker(false);
+    
+    localStorage.setItem("deturno_last_location", JSON.stringify(coords));
+    localStorage.setItem("deturno_permission_state", nextPermissionState);
+
     loadTurnos(coords);
   }
 
