@@ -242,4 +242,15 @@ test.describe("La Plata DeTurno", () => {
       await expect(page.getByTestId("hero-card")).toBeVisible();
     }
   });
+
+  test("shows the share via whatsapp button when a pharmacy is active", async ({ page }) => {
+    await page.goto("/");
+    await waitForHydration(page);
+    await requestLocation(page);
+    await waitForLocatedResults(page);
+
+    const shareButton = page.getByTestId("whatsapp-share-button");
+    await expect(shareButton).toBeVisible();
+    await expect(shareButton).toContainText("Compartir");
+  });
 });

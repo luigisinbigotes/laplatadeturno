@@ -275,6 +275,16 @@ export default function HomePage() {
     applyResolvedLocation(coords, "manual");
   }
 
+  function handleWhatsAppShare() {
+    if (!activePharmacy) return;
+
+    const text = `*${activePharmacy.name}*\n📍 ${activePharmacy.address}\n📞 ${
+      activePharmacy.phone || "Sin teléfono"
+    }\n\n🗺️ Ver en el mapa:\n${activePharmacy.mapUrl}`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  }
+
   function selectPharmacy(pharmacy) {
     const nextKey = pharmacyKey(pharmacy);
 
@@ -396,6 +406,27 @@ export default function HomePage() {
                     data-testid="manual-location-button"
                   >
                     Elegir en mapa
+                  </button>
+                ) : null}
+                {activePharmacy ? (
+                  <button
+                    className={styles.whatsappButton}
+                    onClick={handleWhatsAppShare}
+                    data-testid="whatsapp-share-button"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Compartir
                   </button>
                 ) : null}
               </div>
