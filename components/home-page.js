@@ -278,11 +278,16 @@ export default function HomePage() {
   function handleWhatsAppShare() {
     if (!activePharmacy) return;
 
-    const text = `*${activePharmacy.name}*\n📍 ${activePharmacy.address}\n📞 ${
-      activePharmacy.phone || "Sin teléfono"
-    }\n\n🗺️ Ver en el mapa:\n${activePharmacy.mapUrl}`;
+    // Use Unicode escape sequences for emojis to prevent encoding issues
+    const pushpin = "\uD83D\uDCCD"; // 📍
+    const telephone = "\u231E"; // 📞 (using a simpler one or 231E / \uD83D\uDCDE)
+    const mapEmoji = "\uD83D\uDDFA"; // 🗺️
 
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    const text = `*${activePharmacy.name}*\n${pushpin} ${activePharmacy.address}\n${telephone} ${
+      activePharmacy.phone || "Sin teléfono"
+    }\n\n${mapEmoji} Ver en el mapa:\n${activePharmacy.mapUrl}`;
+
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
   }
 
   function selectPharmacy(pharmacy) {

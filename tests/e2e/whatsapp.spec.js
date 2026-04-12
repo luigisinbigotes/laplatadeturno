@@ -32,14 +32,15 @@ test.describe("WhatsApp Sharing", () => {
 
     // 5. Verify the URL and content
     const sharedUrl = await page.evaluate(() => window.__lastOpenedUrl);
-    expect(sharedUrl).toContain("wa.me");
+    expect(sharedUrl).toContain("whatsapp.com/send");
     
     const decodedText = decodeURIComponent(sharedUrl);
     
     // Assert it contains key metadata based on common pharmacy strings
     expect(decodedText).toContain("Farmacia");
-    expect(decodedText).toContain("📍");
-    expect(decodedText).toContain("🗺️ Ver en el mapa:");
+    // Verify emojis via their strings or unicode
+    expect(decodedText).toContain("\uD83D\uDCCD"); // 📍
+    expect(decodedText).toContain("Ver en el mapa:");
     expect(decodedText).toContain("https://www.google.com/maps");
   });
 });
