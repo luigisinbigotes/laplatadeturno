@@ -1,13 +1,32 @@
 import { ImageResponse } from "next/og";
 
-export const size = {
-  width: 512,
-  height: 512
-};
+export function generateImageMetadata() {
+  return [
+    {
+      contentType: "image/png",
+      size: { width: 32, height: 32 },
+      id: "small"
+    },
+    {
+      contentType: "image/png",
+      size: { width: 192, height: 192 },
+      id: "medium"
+    },
+    {
+      contentType: "image/png",
+      size: { width: 512, height: 512 },
+      id: "large"
+    }
+  ];
+}
 
-export const contentType = "image/png";
+export default function Icon({ id }) {
+  const isLarge = id === "large";
+  const isMedium = id === "medium";
+  const base = 180; // Using AppleIcon base for proportions
+  const target = isLarge ? 512 : isMedium ? 192 : 32;
+  const s = target / base;
 
-export default function Icon() {
   return new ImageResponse(
     (
       <div
@@ -22,80 +41,71 @@ export default function Icon() {
       >
         <div
           style={{
-            width: 428,
-            height: 428,
-            borderRadius: 112,
+            width: 158 * s,
+            height: 158 * s,
+            borderRadius: 42 * s,
             background:
-              "linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(244,236,222,0.88) 38%, rgba(214,226,218,0.92) 100%)",
+              "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(244,236,222,0.9) 38%, rgba(214,226,218,0.94) 100%)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             position: "relative",
             overflow: "hidden",
             boxShadow:
-              "inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -16px 32px rgba(100,122,112,0.16), 0 18px 44px rgba(36,41,39,0.16)"
+              `inset 0 ${1 * s}px 0 rgba(255,255,255,0.9), inset 0 ${-6 * s}px ${14 * s}px rgba(100,122,112,0.16), 0 ${10 * s}px ${22 * s}px rgba(36,41,39,0.16)`
           }}
         >
           <div
             style={{
               position: "absolute",
-              inset: 16,
-              borderRadius: 96,
-              border: "1px solid rgba(255,255,255,0.72)"
+              inset: 6 * s,
+              borderRadius: 36 * s,
+              border: `${1 * s}px solid rgba(255,255,255,0.72)`
             }}
           />
           <div
             style={{
               position: "absolute",
-              top: 24,
-              left: 34,
-              right: 34,
-              height: 132,
-              borderRadius: 72,
+              top: 10 * s,
+              left: 14 * s,
+              right: 14 * s,
+              height: 46 * s,
+              borderRadius: 24 * s,
               background: "linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.06) 100%)"
             }}
           />
           <div
             style={{
               position: "absolute",
-              width: 332,
-              height: 332,
-              borderRadius: 96,
-              background: "radial-gradient(circle at 30% 22%, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0) 48%)"
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              width: 108,
-              height: 286,
+              width: 40 * s,
+              height: 104 * s,
               background: "linear-gradient(180deg, #57d696 0%, #248e63 100%)",
-              borderRadius: 34,
-              boxShadow: "0 8px 24px rgba(35,115,82,0.28)"
+              borderRadius: 14 * s,
+              boxShadow: `0 ${4 * s}px ${12 * s}px rgba(35,115,82,0.28)`
             }}
           />
           <div
             style={{
               position: "absolute",
-              width: 286,
-              height: 108,
+              width: 104 * s,
+              height: 40 * s,
               background: "linear-gradient(90deg, #57d696 0%, #248e63 100%)",
-              borderRadius: 34,
-              boxShadow: "0 8px 24px rgba(35,115,82,0.28)"
+              borderRadius: 14 * s,
+              boxShadow: `0 ${4 * s}px ${12 * s}px rgba(35,115,82,0.28)`
             }}
           />
           <div
             style={{
               position: "absolute",
-              width: 254,
-              height: 254,
-              borderRadius: 76,
+              width: 94 * s,
+              height: 94 * s,
+              borderRadius: 28 * s,
               background: "radial-gradient(circle at 34% 26%, rgba(255,255,255,0.44) 0%, rgba(255,255,255,0) 58%)"
             }}
           />
         </div>
       </div>
     ),
-    size
+    { width: target, height: target }
   );
 }

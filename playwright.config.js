@@ -18,7 +18,10 @@ export default defineConfig({
     baseURL,
     trace: traceMode,
     screenshot: screenshotMode,
-    video: videoMode
+    video: videoMode,
+    extraHTTPHeaders: {
+      "x-bypass-rate-limit": "true"
+    }
   },
   projects: [
     {
