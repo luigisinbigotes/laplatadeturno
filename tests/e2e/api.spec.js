@@ -11,6 +11,18 @@ test.describe("Public API hardening", () => {
     expect(json.pharmacies[0].distanceKm).not.toBeNull();
   });
 
+  test("farmacias returns tomorrow preview data", async ({ request }) => {
+    const response = await request.get("/api/farmacias?day=tomorrow");
+    expect(response.ok()).toBeTruthy();
+
+    const json = await response.json();
+    expect(json.dayScope).toBe("tomorrow");
+    expect(json.detailsLevel).toBe("address-only");
+    expect(Array.isArray(json.pharmacies)).toBeTruthy();
+    expect(json.pharmacies.length).toBeGreaterThan(0);
+    expect(json.pharmacies[0].distanceKm).toBeNull();
+  });
+
   test("route rejects coordinates outside La Plata bounds", async ({ request }) => {
     const response = await request.get(
       "/api/route?fromLat=-34.6037&fromLng=-58.3816&toLat=-34.9214&toLng=-57.9545"

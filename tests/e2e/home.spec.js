@@ -21,6 +21,8 @@ test.describe("La Plata DeTurno", () => {
     await expect(page.getByRole("heading", { name: "Turno del dia" })).toBeVisible();
     await expect(page.getByTestId("list-view-button")).toBeVisible();
     await expect(page.getByTestId("map-view-button")).toBeVisible();
+    await expect(page.getByTestId("day-scope-button")).toHaveText(/ver mañana/i);
+    await expect(page.getByTestId("active-pharmacy-distance")).toHaveCount(0);
 
     if (browserName === "chromium") {
       await expect(page.getByTestId("location-button")).toBeVisible();
@@ -55,6 +57,24 @@ test.describe("La Plata DeTurno", () => {
     await expect(page.getByTestId("turno-map")).toBeVisible();
   });
 
+  test("can switch to tomorrow and return to today", async ({ page }) => {
+    await page.goto("/");
+    await waitForHydration(page);
+
+    await page.getByTestId("day-scope-button").click();
+    await expect(page.getByTestId("day-scope-heading")).toHaveText(/turno de mañana/i, {
+      timeout: 20000
+    });
+    await expect(page.getByTestId("day-scope-button")).toHaveText(/volver a hoy/i);
+    await expect(page.getByTestId("summary-text")).toContainText(/turnero oficial de mañana/i);
+    await expect(page.getByTestId("active-pharmacy-distance")).toHaveCount(0);
+
+    await page.getByTestId("day-scope-button").click();
+    await expect(page.getByTestId("day-scope-heading")).toHaveText(/turno del dia/i, {
+      timeout: 20000
+    });
+  });
+
   test("can select a pharmacy and return to the closest one", async ({ page }) => {
     await page.goto("/");
     await waitForHydration(page);
@@ -68,8 +88,10 @@ test.describe("La Plata DeTurno", () => {
     const key = await selectedCard.getAttribute("data-pharmacy-key");
     const selected = await extractCard(selectedCard);
 
-    // Click by key to be absolutely sure
-    await page.locator(`article[data-pharmacy-key="${key}"]`).click({ force: true, position: { x: 5, y: 5 } });
+    // Ensure it is in view and click (scrolled to center to avoid floating map and headers)
+    const targetLocator = page.locator(`article[data-pharmacy-key="${key}"]`);
+    await targetLocator.evaluate(el => el.scrollIntoView({ block: "center" }));
+    await targetLocator.click({ force: true });
 
     await expect.poll(
       async () => {
@@ -79,6 +101,7 @@ test.describe("La Plata DeTurno", () => {
       { timeout: 20000 }
     ).toBe(`farmacia seleccionada|||${selected.title}`);
 
+    await page.getByTestId("reset-selection-button").scrollIntoViewIfNeeded();
     await page.getByTestId("reset-selection-button").click({ force: true });
     await page.waitForTimeout(500);
     await waitForLocatedResults(page);
@@ -141,7 +164,10 @@ test.describe("La Plata DeTurno", () => {
 
     const beforeSelectionY = await page.evaluate(() => window.scrollY);
     
-    await page.locator(`article[data-pharmacy-key="${key}"]`).click({ force: true, position: { x: 5, y: 5 } });
+    const targetLocator = page.locator(`article[data-pharmacy-key="${key}"]`);
+    // Ensure it's in the center of the viewport to avoid floating map interception
+    await targetLocator.evaluate(el => el.scrollIntoView({ block: 'center' }));
+    await targetLocator.click({ force: true });
 
     await expect
       .poll(async () => {
@@ -195,8 +221,10 @@ test.describe("La Plata DeTurno", () => {
 
     expect(phoneHref).toMatch(/^tel:\+/);
 
-    // Select the card first
-    await page.locator(`article[data-pharmacy-key="${key}"]`).click({ force: true, position: { x: 5, y: 5 } });
+    // Select the card first (scrolled to center to avoid floating map)
+    const targetLocator = page.locator(`article[data-pharmacy-key="${key}"]`);
+    await targetLocator.evaluate(el => el.scrollIntoView({ block: "center" }));
+    await targetLocator.click({ force: true });
     
     // Wait for selection to propagate
     await expect.poll(async () => (await extractBanner(page)).title, { timeout: 20000 }).toBe(selectedTitle);
@@ -221,7 +249,10 @@ test.describe("La Plata DeTurno", () => {
     const targetCard = cards.nth(count - 1);
     const key = await targetCard.getAttribute("data-pharmacy-key");
     
-    await page.locator(`article[data-pharmacy-key="${key}"]`).click({ force: true, position: { x: 5, y: 5 } });
+    const targetLocator = page.locator(`article[data-pharmacy-key="${key}"]`);
+    await targetLocator.evaluate(el => el.scrollIntoView({ block: 'center' }));
+    await targetLocator.click({ force: true });
+    
     // Wait enough for a potential smooth scroll to finish if it were to happen
     await page.waitForTimeout(1500);
 

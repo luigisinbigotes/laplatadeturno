@@ -113,7 +113,18 @@ export default function MiniRouteMap({ userLocation, pharmacy, canRoute, variant
     return points;
   }, [destination, userLocation]);
 
-  if (!userLocation || !destination || !canRoute) {
+  if (!destination) {
+    return (
+      <div
+        className={`${styles.placeholder} ${variant === "floating" ? styles.placeholderFloating : ""}`}
+        data-testid="mini-route-map-placeholder"
+      >
+        <p>La ruta todavía no está disponible porque el turnero oficial de mañana solo publica direcciones.</p>
+      </div>
+    );
+  }
+
+  if (!userLocation || !canRoute) {
     return (
       <div
         className={`${styles.placeholder} ${variant === "floating" ? styles.placeholderFloating : ""}`}

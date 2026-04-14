@@ -240,6 +240,10 @@
   margin: 8px 0 0;
 }
 
+.panelHeader > div:first-child {
+  min-width: 0;
+}
+
 .toggle {
   display: inline-flex;
   gap: 8px;

@@ -46,6 +46,7 @@ export default function HomePage() {
   const [locationLabelResolved, setLocationLabelResolved] = useState("");
   const [requiresManualLocationRequest, setRequiresManualLocationRequest] = useState(false);
   const [showManualLocationPicker, setShowManualLocationPicker] = useState(false);
+  const [dayScope, setDayScope] = useState("today");
   const [view, setView] = useState("list");
   const [pharmacies, setPharmacies] = useState([]);
   const [selectedPharmacyKey, setSelectedPharmacyKey] = useState(null);
@@ -53,6 +54,7 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [showFloatingMiniMap, setShowFloatingMiniMap] = useState(false);
   const [heroMiniMapDocked, setHeroMiniMapDocked] = useState(false);
+  const [detailsLevel, setDetailsLevel] = useState("full");
 
   const nearest = pharmacies[0] ?? null;
   const activePharmacy =
@@ -68,7 +70,7 @@ export default function HomePage() {
         const coords = JSON.parse(savedLocation);
         setLocation(coords);
         setPermissionState(savedPermission);
-        loadTurnos(coords);
+        loadTurnos(coords, "today");
         return;
       } catch (e) {
         console.error("Failed to parse saved location", e);
@@ -81,7 +83,7 @@ export default function HomePage() {
 
     if (isIos && isSafari) {
       setRequiresManualLocationRequest(true);
-      loadTurnos();
+      loadTurnos(undefined, "today");
       return;
     }
 
@@ -199,15 +201,16 @@ export default function HomePage() {
     localStorage.setItem("deturno_last_location", JSON.stringify(coords));
     localStorage.setItem("deturno_permission_state", nextPermissionState);
 
-    loadTurnos(coords);
+    loadTurnos(coords, dayScope);
   }
 
-  async function loadTurnos(coords) {
+  async function loadTurnos(coords, nextDayScope = dayScope) {
     setLoading(true);
     setError("");
 
     try {
       const params = new URLSearchParams();
+      params.set("day", nextDayScope);
       if (coords?.latitude && coords?.longitude) {
         params.set("lat", String(coords.latitude));
         params.set("lng", String(coords.longitude));
@@ -220,6 +223,8 @@ export default function HomePage() {
 
       const data = await response.json();
       const nextPharmacies = data.pharmacies ?? [];
+      setDayScope(data.dayScope ?? nextDayScope);
+      setDetailsLevel(data.detailsLevel ?? "full");
       setPharmacies(nextPharmacies);
       setSelectedPharmacyKey(nextPharmacies[0] ? pharmacyKey(nextPharmacies[0]) : null);
     } catch (fetchError) {
@@ -233,7 +238,7 @@ export default function HomePage() {
     if (!navigator.geolocation) {
       setPermissionState("unsupported");
       setError("Tu navegador no soporta geolocalización.");
-      loadTurnos();
+      loadTurnos(undefined, dayScope);
       return;
     }
 
@@ -256,7 +261,7 @@ export default function HomePage() {
             ? "No pudimos acceder a tu ubicacion. En iPhone usa este boton desde Safari o desde la app instalada."
             : "No pudimos acceder a tu ubicación. Te mostramos igual el turno del día."
         );
-        loadTurnos();
+        loadTurnos(undefined, dayScope);
       },
       {
         enableHighAccuracy: true,
@@ -316,6 +321,10 @@ export default function HomePage() {
   }
 
   const summaryText = useMemo(() => {
+    if (dayScope === "tomorrow" && detailsLevel === "address-only") {
+      return "Mostramos el turnero oficial de mañana. Hasta que el Colegio publique el listado diario completo, vas a ver direcciones y accesos al mapa, pero no cercanía exacta ni teléfonos.";
+    }
+
     if (hasUsableLocation && activePharmacy?.distanceKm != null) {
       if (activePharmacy.distanceKm > 25) {
         return `Tu ubicacion parece estar fuera de La Plata. La farmacia seleccionada queda a ${activePharmacy.distanceKm.toFixed(2)} km.`;
@@ -329,7 +338,7 @@ export default function HomePage() {
     }
 
     return "Mostramos el turno vigente en La Plata; si habilitás tu ubicación, ordenamos por cercanía.";
-  }, [activePharmacy, hasUsableLocation, permissionState]);
+  }, [activePharmacy, dayScope, detailsLevel, hasUsableLocation, permissionState]);
 
   const locationLabel = useMemo(() => {
     if (hasUsableLocation && location) {
@@ -374,7 +383,9 @@ export default function HomePage() {
               <span className={styles.cardLabel} data-testid="active-pharmacy-label">
                 {activePharmacy && nearest && pharmacyKey(activePharmacy) !== pharmacyKey(nearest)
                   ? "Farmacia seleccionada"
-                  : "Mas cercana ahora"}
+                  : dayScope === "tomorrow"
+                    ? "Turno de mañana"
+                    : "Mas cercana ahora"}
               </span>
               <strong data-testid="active-pharmacy-name">
                 {activePharmacy ? activePharmacy.name : "Cargando turnos..."}
@@ -413,6 +424,13 @@ export default function HomePage() {
                     Elegir en mapa
                   </button>
                 ) : null}
+                <button
+                  className={styles.secondaryButton}
+                  onClick={() => loadTurnos(location ?? undefined, dayScope === "today" ? "tomorrow" : "today")}
+                  data-testid="day-scope-button"
+                >
+                  {dayScope === "today" ? "Ver mañana" : "Volver a hoy"}
+                </button>
                 {activePharmacy ? (
                   <button
                     className={styles.whatsappButton}
@@ -473,8 +491,11 @@ export default function HomePage() {
       <section className={styles.panel} data-testid="turno-panel">
         <div className={styles.panelHeader}>
           <div>
-            <h2>Turno del dia</h2>
-            <p>Fuente oficial: Colegio de Farmaceuticos de La Plata.</p>
+            <h2 data-testid="day-scope-heading">{dayScope === "today" ? "Turno del dia" : "Turno de mañana"}</h2>
+            <p>
+              Fuente oficial: Colegio de Farmaceuticos de La Plata.
+              {dayScope === "tomorrow" ? " Vista previa del turnero de mañana." : ""}
+            </p>
           </div>
           <div className={styles.toggle} data-testid="view-toggle">
             <button
