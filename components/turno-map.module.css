@@ -4,6 +4,34 @@
   border: 1px solid var(--line);
 }
 
+.emptyWrapper {
+  min-height: min(70vh, 640px);
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.3)),
+    var(--surface);
+}
+
+.emptyState {
+  max-width: 32rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.emptyState strong {
+  display: block;
+  margin-bottom: 0.65rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+}
+
+.emptyState p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .map {
   width: 100%;
   height: min(70vh, 640px);
@@ -37,5 +65,13 @@
   .wrapper {
     border: 0;
     border-radius: 0;
+  }
+
+  .emptyWrapper {
+    min-height: 48vh;
+  }
+
+  .emptyState {
+    padding: 1.4rem 1.1rem;
   }
 }

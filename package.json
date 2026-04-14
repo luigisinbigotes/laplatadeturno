@@ -17,6 +17,7 @@
     "test:e2e:install": "playwright install"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.97",
     "leaflet": "^1.9.4",
     "next": "^15.3.0",
     "pdf-parse": "^2.4.5",

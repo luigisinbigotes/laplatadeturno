@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -22,6 +23,21 @@ export default function TurnoMap({ pharmacies, userLocation }) {
     userLocation && Number.isFinite(userLocation.latitude) && Number.isFinite(userLocation.longitude)
       ? [userLocation.latitude, userLocation.longitude]
       : [-34.9205, -57.9536];
+  const mappablePharmacies = useMemo(
+    () => pharmacies.filter((pharmacy) => pharmacy.latitude != null && pharmacy.longitude != null),
+    [pharmacies]
+  );
+
+  if (mappablePharmacies.length === 0) {
+    return (
+      <div className={`${styles.wrapper} ${styles.emptyWrapper}`} data-testid="turno-map-empty">
+        <div className={styles.emptyState}>
+          <strong>Mapa no disponible</strong>
+          <p>El turnero de mañana todavia solo publica direcciones, asi que mostramos la lista y el acceso al mapa externo.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.wrapper} data-testid="turno-map">
@@ -37,25 +53,23 @@ export default function TurnoMap({ pharmacies, userLocation }) {
           </Marker>
         ) : null}
 
-        {pharmacies
-          .filter((pharmacy) => pharmacy.latitude != null && pharmacy.longitude != null)
-          .map((pharmacy) => (
-            <Marker
-              key={`${pharmacy.name}-${pharmacy.address}`}
-              position={[pharmacy.latitude, pharmacy.longitude]}
-              icon={icon}
-            >
-              <Popup>
-                <strong>{pharmacy.name}</strong>
-                <br />
-                {pharmacy.address}
-                <br />
-                <a href={pharmacy.mapUrl} target="_blank" rel="noreferrer">
-                  Abrir ruta
-                </a>
-              </Popup>
-            </Marker>
-          ))}
+        {mappablePharmacies.map((pharmacy) => (
+          <Marker
+            key={`${pharmacy.name}-${pharmacy.address}`}
+            position={[pharmacy.latitude, pharmacy.longitude]}
+            icon={icon}
+          >
+            <Popup>
+              <strong>{pharmacy.name}</strong>
+              <br />
+              {pharmacy.address}
+              <br />
+              <a href={pharmacy.mapUrl} target="_blank" rel="noreferrer">
+                Abrir ruta
+              </a>
+            </Popup>
+          </Marker>
+        ))}
       </MapContainer>
     </div>
   );

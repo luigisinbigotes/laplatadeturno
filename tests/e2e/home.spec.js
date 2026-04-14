@@ -56,6 +56,20 @@ test.describe("La Plata DeTurno", () => {
     await expect(page.getByTestId("turno-map")).toBeVisible();
   });
 
+  test("shows a clear map placeholder for tomorrow preview data", async ({ page }) => {
+    await page.goto("/");
+    await waitForHydration(page);
+
+    await page.getByTestId("day-scope-button").click();
+    await expect(page.getByTestId("day-scope-heading")).toHaveText(/turno de mañana/i, {
+      timeout: 20000
+    });
+
+    await page.getByTestId("map-view-button").click();
+    await expect(page.getByTestId("turno-map-empty")).toBeVisible();
+    await expect(page.getByTestId("turno-map-empty")).toContainText(/mapa no disponible/i);
+  });
+
   test("can switch to tomorrow and return to today", async ({ page }) => {
     await page.goto("/");
     await waitForHydration(page);
