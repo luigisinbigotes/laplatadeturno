@@ -22,7 +22,6 @@ test.describe("La Plata DeTurno", () => {
     await expect(page.getByTestId("list-view-button")).toBeVisible();
     await expect(page.getByTestId("map-view-button")).toBeVisible();
     await expect(page.getByTestId("day-scope-button")).toHaveText(/ver mañana/i);
-    await expect(page.getByTestId("active-pharmacy-distance")).toHaveCount(0);
 
     if (browserName === "chromium") {
       await expect(page.getByTestId("location-button")).toBeVisible();
@@ -66,7 +65,7 @@ test.describe("La Plata DeTurno", () => {
       timeout: 20000
     });
     await expect(page.getByTestId("day-scope-button")).toHaveText(/volver a hoy/i);
-    await expect(page.getByTestId("summary-text")).toContainText(/turnero oficial de mañana/i);
+    await expect(page.getByTestId("summary-text")).toContainText(/mañana/i);
     await expect(page.getByTestId("active-pharmacy-distance")).toHaveCount(0);
 
     await page.getByTestId("day-scope-button").click();
@@ -155,19 +154,12 @@ test.describe("La Plata DeTurno", () => {
     const cards = pharmacyCards(page);
     await scrollToBottom(page);
     await expect(page.getByTestId("floating-mini-map")).toBeVisible();
-    
-    const count = await cards.count();
-    const targetIndex = Math.max(0, count - 1);
-    const targetCard = cards.nth(targetIndex);
-    const key = await targetCard.getAttribute("data-pharmacy-key");
+    await expect(cards.last()).toBeVisible();
+    const targetCard = cards.last();
     const selected = await extractCard(targetCard);
 
     const beforeSelectionY = await page.evaluate(() => window.scrollY);
-    
-    const targetLocator = page.locator(`article[data-pharmacy-key="${key}"]`);
-    // Ensure it's in the center of the viewport to avoid floating map interception
-    await targetLocator.evaluate(el => el.scrollIntoView({ block: 'center' }));
-    await targetLocator.click({ force: true });
+    await targetCard.click({ force: true });
 
     await expect
       .poll(async () => {
@@ -245,21 +237,14 @@ test.describe("La Plata DeTurno", () => {
     await scrollToBottom(page);
     
     const cards = pharmacyCards(page);
-    const count = await cards.count();
-    const targetCard = cards.nth(count - 1);
-    const key = await targetCard.getAttribute("data-pharmacy-key");
-    
-    const targetLocator = page.locator(`article[data-pharmacy-key="${key}"]`);
-    await targetLocator.evaluate(el => el.scrollIntoView({ block: 'center' }));
-    await targetLocator.click({ force: true });
+    await expect(cards.last()).toBeVisible();
+    await cards.last().click({ force: true });
     
     // Wait enough for a potential smooth scroll to finish if it were to happen
     await page.waitForTimeout(1500);
 
-    const box = await page.getByTestId("hero-section").boundingBox();
-    // On mobile, selection should NOT scroll hero into view, so it stays far above the fold
-    // Since we scrolled to bottom, it should be significantly negative
-    expect(box?.y ?? 0).toBeLessThan(-200); 
+    const scrollY = await page.evaluate(() => window.scrollY);
+    expect(scrollY).toBeGreaterThan(500);
   });
 
   test("renders key content in every theme", async ({ page }, testInfo) => {

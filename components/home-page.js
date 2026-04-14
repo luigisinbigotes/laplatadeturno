@@ -321,6 +321,10 @@ export default function HomePage() {
   }
 
   const summaryText = useMemo(() => {
+    if (dayScope === "tomorrow" && detailsLevel === "unavailable") {
+      return "La vista de mañana todavía no está disponible. Preferimos ocultarla antes que mostrar datos inconsistentes.";
+    }
+
     if (dayScope === "tomorrow" && detailsLevel === "address-only") {
       return "Mostramos el turnero oficial de mañana. Hasta que el Colegio publique el listado diario completo, vas a ver direcciones y accesos al mapa, pero no cercanía exacta ni teléfonos.";
     }
@@ -388,10 +392,18 @@ export default function HomePage() {
                     : "Mas cercana ahora"}
               </span>
               <strong data-testid="active-pharmacy-name">
-                {activePharmacy ? activePharmacy.name : "Cargando turnos..."}
+                {activePharmacy
+                  ? activePharmacy.name
+                  : dayScope === "tomorrow" && detailsLevel === "unavailable"
+                    ? "Vista previa no disponible"
+                    : "Cargando turnos..."}
               </strong>
               <p data-testid="active-pharmacy-address">
-                {activePharmacy ? activePharmacy.address : "Consultando fuente oficial..."}
+                {activePharmacy
+                  ? activePharmacy.address
+                  : dayScope === "tomorrow" && detailsLevel === "unavailable"
+                    ? "Estamos validando una fuente estable para mañana."
+                    : "Consultando fuente oficial..."}
               </p>
               {activePharmacy?.phone ? (
                 <a
@@ -525,6 +537,13 @@ export default function HomePage() {
           <TurnoMap pharmacies={pharmacies} userLocation={location ?? defaultCenter} />
         ) : (
           <div className={styles.list} data-testid="pharmacy-list">
+            {pharmacies.length === 0 ? (
+              <p className={styles.loading} data-testid="empty-day-scope-message">
+                {dayScope === "tomorrow"
+                  ? "La vista de mañana todavía no está lista."
+                  : "No encontramos farmacias para mostrar."}
+              </p>
+            ) : null}
             {pharmacies.map((pharmacy, index) => (
               <article
                 className={`${styles.item} ${

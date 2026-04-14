@@ -3,7 +3,6 @@ import {
   sortPharmaciesByDistance,
   withNullDistances
 } from "@/lib/farmacias";
-import { fetchTomorrowTurnos } from "@/lib/turnero-calendar";
 import {
   applyRateLimit,
   getCachedValue,
@@ -62,11 +61,12 @@ export async function GET(request) {
       detailsLevel = tomorrowCache.detailsLevel;
       targetDate = new Date(tomorrowCache.targetDate);
     } else {
-      const tomorrowTurnos = await fetchTomorrowTurnos();
-      pharmacies = withNullDistances(tomorrowTurnos.pharmacies);
-      source = tomorrowTurnos.sourceUrl;
-      detailsLevel = "address-only";
-      targetDate = tomorrowTurnos.targetDate;
+      targetDate = new Date();
+      targetDate.setHours(0, 0, 0, 0);
+      targetDate.setDate(targetDate.getDate() + 1);
+      pharmacies = withNullDistances([]);
+      source = "https://www.colfarmalp.org.ar/wp-content/uploads/turnos/lp.pdf";
+      detailsLevel = "unavailable";
       setCachedValue(
         pharmacyCache,
         "la-plata-tomorrow",
