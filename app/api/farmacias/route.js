@@ -64,9 +64,21 @@ export async function GET(request) {
       targetDate = new Date();
       targetDate.setHours(0, 0, 0, 0);
       targetDate.setDate(targetDate.getDate() + 1);
-      pharmacies = withNullDistances([]);
-      source = "https://www.colfarmalp.org.ar/wp-content/uploads/turnos/lp.pdf";
-      detailsLevel = "unavailable";
+
+      try {
+        const { fetchTomorrowTurnos } = await import("@/lib/turnero-calendar");
+        const tomorrowTurnos = await fetchTomorrowTurnos(targetDate);
+
+        pharmacies = withNullDistances(tomorrowTurnos.pharmacies);
+        source = tomorrowTurnos.sourceUrl;
+        detailsLevel = "address-only";
+        targetDate = tomorrowTurnos.targetDate;
+      } catch {
+        pharmacies = withNullDistances([]);
+        source = "https://www.colfarmalp.org.ar/wp-content/uploads/turnos/lp.pdf";
+        detailsLevel = "unavailable";
+      }
+
       setCachedValue(
         pharmacyCache,
         "la-plata-tomorrow",
